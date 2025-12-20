@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Ceconi 3D</title>
+    <link rel="stylesheet" type="text/css" href="Adm.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Carregando...</p>
+        </div>
+    </div>
+
+    <div class="modal" id="confirm-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">Confirmar Ação</h3>
+            <p id="modal-message">Você tem certeza?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
+                <button class="btn btn-danger" id="modal-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="security-message" class="security-message" style="display: none;"></div>
+
+    <div class="container" id="login-container">
+        <div class="login-box">
+            <img src="IMAGENS/LOGO_PNG.png" alt="Logo" class="login-logo">
+            <h2>Acesso Administrativo</h2>
+            <div class="form-group">
+                <label for="admin-email">E-mail</label>
+                <input type="email" id="admin-email" class="form-control" placeholder="admin@email.com">
+            </div>
+            <div class="form-group">
+                <label for="admin-password">Senha</label>
+                <input type="password" id="admin-password" class="form-control" placeholder="••••••••" required>
+                <div id="password-strength" class="password-strength"></div>
+            </div>
+            <button class="btn btn-primary" id="login-btn" style="width: 100%;">Entrar</button>
+            <p style="text-align: center; margin-top: 15px;">
+                <a href="Site.html" style="color: var(--gray); font-size: 0.9rem;">Voltar ao Site</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="dashboard-container" style="display: none;">
+        <header class="admin-header">
+            <div class="container">
+                <nav class="navbar">
+                    <a href="Site.html" class="logo">
+                        <img src="IMAGENS/LOGO_PNG.png" alt="Ceconi 3D" class="logo-image">
+                        <span class="admin-badge">Admin</span>
+                    </a>
+                    <div class="admin-user">
+                        <span id="admin-user-email">admin@email.com</span>
+                        <button class="btn btn-logout" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </button>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container">
+            <section class="dashboard-stats">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-products">0</h3>
+                            <p>Produtos Totais</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-tags"></i></div>
+                        <div class="stat-info">
+                            <h3 id="stat-total-categories">0</h3>
+                            <p>Categorias</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="products-management">
+                <div class="product-form-container">
+                    <div class="form-header">
+                        <h3 id="form-title">Adicionar Novo Produto</h3>
+                        <button class="btn btn-secondary" id="cancel-edit-btn" style="display: none;">
+                            <i class="fas fa-times"></i> Cancelar Edição
+                        </button>
+                    </div>
+                    
+                    <div id="form-validation-message" class="validation-message" style="display: none;"></div>
+                    
+                    <form id="product-form">
+                        <div class="form-group">
+                            <label for="product-name">Nome do Produto *</label>
+                            <input type="text" id="product-name" class="form-control" required maxlength="100">
+                            <div id="product-name-counter" class="character-counter"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="product-description">Descrição *</label>
+                            <textarea id="product-description" class="form-control" required maxlength="1000"></textarea>
+                            <div id="product-description-counter" class="character-counter"></div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-price">Preço (R$) *</label>
+                                <input type="number" id="product-price" class="form-control" step="0.01" min="0" max="100000" required>
+                                <div class="field-help">Valor entre R$ 0,00 e R$ 100.000,00</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-category">Categoria *</label>
+                                <select id="product-category" class="form-control" required>
+                                    <option value="">Selecione uma categoria</option>
+                                    <option value="decoracao">Decoração</option>
+                                    <option value="utilitarios">Utilitários</option>
+                                    <option value="prototipos">Protótipos</option>
+                                    <option value="joias">Jóias e Acessórios</option>
+                                    <option value="brinquedos">Brinquedos</option>
+                                    <option value="ferramentas">Ferramentas</option>
+                                    <option value="automotivo">Automotivo</option>
+                                    <option value="medico">Médico e Odontológico</option>
+                                    <option value="arquitetura">Arquitetura e Maquetes</option>
+                                    <option value="educacao">Educação</option>
+                                    <option value="moda">Moda</option>
+                                    <option value="esportes">Esportes</option>
+                                    <option value="personalizado">Personalizado</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-dimensions">Dimensões (L x A x P)</label>
+                                <input type="text" id="product-dimensions" class="form-control" placeholder="Ex: 10x15x5 cm" maxlength="50">
+                                <div id="product-dimensions-counter" class="character-counter"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-material">Material</label>
+                                <input type="text" id="product-material" class="form-control" placeholder="Ex: PLA, ABS, PETG" maxlength="100">
+                                <div id="product-material-counter" class="character-counter"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-weight">Peso</label>
+                                <input type="number" id="product-weight" class="form-control" step="0.1" min="0" max="10000">
+                                <div class="field-help">Peso máximo: 10.000g</div>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-print-time">Tempo de Impressão</label>
+                                <input type="text" id="product-print-time" class="form-control" placeholder="Ex: 3 horas" maxlength="50">
+                                <div id="product-print-time-counter" class="character-counter"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="product-specifications">Especificações Técnicas</label>
+                            <textarea id="product-specifications" class="form-control" placeholder="Detalhes técnicos do produto" maxlength="2000"></textarea>
+                            <div id="product-specifications-counter" class="character-counter"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Imagens do Produto</label>
+                            <div class="image-upload-container">
+                                <div class="upload-area" id="upload-area">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Arraste imagens aqui ou clique para selecionar</p>
+                                    <input type="file" id="product-images" multiple accept="image/*" style="display: none;">
+                                    <button type="button" class="btn btn-outline" id="select-images-btn">Selecionar Imagens</button>
+                                    <div class="field-help">Máximo 10 imagens • Formatos: JPG, PNG, GIF • Tamanho máximo: 5MB cada</div>
+                                </div>
+                                <div class="image-preview" id="image-preview"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="save-product-btn">
+                                <i class="fas fa-save"></i> Salvar Produto
+                            </button>
+                            <button type="button" class="btn btn-secondary" id="clear-form-btn">
+                                <i class="fas fa-broom"></i> Limpar Formulário
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="section-header">
+                    <h2><i class="fas fa-list"></i> Produtos Cadastrados</h2>
+                </div>
+                
+                <div class="admin-products-controls">
+                    <div class="search-box">
+                        <input type="text" id="admin-product-search" placeholder="Buscar produto por nome..." class="form-control">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="filter-controls">
+                        <select id="admin-category-filter" class="form-control">
+                            <option value="all">Todas as categorias</option>
+                            <option value="decoracao">Decoração</option>
+                            <option value="utilitarios">Utilitários</option>
+                            <option value="prototipos">Protótipos</option>
+                            <option value="joias">Jóias e Acessórios</option>
+                            <option value="brinquedos">Brinquedos</option>
+                            <option value="ferramentas">Ferramentas</option>
+                            <option value="automotivo">Automotivo</option>
+                            <option value="medico">Médico e Odontológico</option>
+                            <option value="arquitetura">Arquitetura e Maquetes</option>
+                            <option value="educacao">Educação</option>
+                            <option value="moda">Moda</option>
+                            <option value="esportes">Esportes</option>
+                            <option value="personalizado">Personalizado</option>
+                        </select>
+                        <select id="admin-sort-by" class="form-control">
+                            <option value="newest">Mais recentes</option>
+                            <option value="oldest">Mais antigos</option>
+                            <option value="name-asc">Nome (A-Z)</option>
+                            <option value="name-desc">Nome (Z-A)</option>
+                            <option value="price-asc">Preço (menor)</option>
+                            <option value="price-desc">Preço (maior)</option>
+                        </select>
+                        <select id="admin-items-per-page" class="form-control">
+                            <option value="10">10 por página</option>
+                            <option value="25" selected>25 por página</option>
+                            <option value="50">50 por página</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="admin-products-stats">
+                    <span id="products-count">0 produtos encontrados</span>
+                    <div class="view-toggle">
+                        <button id="grid-view-btn" class="view-btn active" title="Visualização em grade">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="admin-products-container" id="admin-products-container">
+                    <!-- Produtos serão renderizados aqui -->
+                </div>
+                
+                <div class="pagination-container" id="pagination-container">
+                    <!-- Paginação será renderizada aqui -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Firebase v8 (compatível) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+
+    <script src="firebase-service.js"></script>
+    <script src="Adm.js"></script>
+</body>
+</html>
