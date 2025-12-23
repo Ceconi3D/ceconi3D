@@ -17,6 +17,50 @@ let currentCategoryFilter = 'all';
 let currentSortBy = 'newest';
 let currentView = 'grid';
 
+// Lista completa de cores disponíveis (com nomes e códigos hex)
+const AVAILABLE_COLORS = [
+    { name: "Branco", hex: "#FFFFFF" },
+    { name: "Preto", hex: "#000000" },
+    { name: "Cinza", hex: "#808080" },
+    { name: "Prata", hex: "#C0C0C0" },
+    { name: "Vermelho", hex: "#FF0000" },
+    { name: "Vermelho Escuro", hex: "#8B0000" },
+    { name: "Vermelho Claro", hex: "#FF6B6B" },
+    { name: "Azul", hex: "#0000FF" },
+    { name: "Azul Marinho", hex: "#000080" },
+    { name: "Azul Claro", hex: "#ADD8E6" },
+    { name: "Azul Turquesa", hex: "#40E0D0" },
+    { name: "Verde", hex: "#008000" },
+    { name: "Verde Limão", hex: "#32CD32" },
+    { name: "Verde Claro", hex: "#90EE90" },
+    { name: "Verde Escuro", hex: "#006400" },
+    { name: "Amarelo", hex: "#FFFF00" },
+    { name: "Amarelo Ouro", hex: "#FFD700" },
+    { name: "Laranja", hex: "#FFA500" },
+    { name: "Rosa", hex: "#FFC0CB" },
+    { name: "Rosa Choque", hex: "#FF1493" },
+    { name: "Roxo", hex: "#800080" },
+    { name: "Roxo Claro", hex: "#9370DB" },
+    { name: "Violeta", hex: "#EE82EE" },
+    { name: "Marrom", hex: "#8B4513" },
+    { name: "Marrom Claro", hex: "#D2691E" },
+    { name: "Bege", hex: "#F5F5DC" },
+    { name: "Dourado", hex: "#FFD700" },
+    { name: "Prata Metálico", hex: "#A6A6A6" },
+    { name: "Bronze", hex: "#CD7F32" },
+    { name: "Cobre", hex: "#B87333" },
+    { name: "Transparente", hex: "#FFFFFF", opacity: 0.3 },
+    { name: "Fosco Branco", hex: "#F5F5F5" },
+    { name: "Fosco Preto", hex: "#1A1A1A" },
+    { name: "Neon Rosa", hex: "#FF6EC7" },
+    { name: "Neon Verde", hex: "#39FF14" },
+    { name: "Neon Azul", hex: "#00FFFF" },
+    { name: "Neon Amarelo", hex: "#FFFF33" }
+];
+
+// Array para armazenar cores selecionadas
+let selectedColors = [];
+
 // Elementos do DOM
 const loadingOverlay = document.getElementById('loading-overlay');
 const loginContainer = document.getElementById('login-container');
@@ -67,6 +111,9 @@ async function initializeAdmin() {
         setupRealTimeValidation();
         updateCategoryOptions();
         
+        // NOVO: Inicializar seletor de cores
+        initializeColorSelector();
+        
         // Checar se o usuário já está logado
         firebaseService.auth.onAuthStateChanged(async (user) => {
             if (user) {
@@ -101,6 +148,135 @@ async function initializeAdmin() {
         hideLoading();
         alert('Erro ao inicializar o sistema: ' + error.message);
     }
+}
+
+// ========================================================================
+// === SISTEMA DE SELEÇÃO DE CORES
+// ========================================================================
+
+// Função para inicializar o seletor de cores
+function initializeColorSelector() {
+    const colorsGrid = document.getElementById('colors-grid');
+    const selectedColorsChips = document.getElementById('selected-colors-chips');
+    const selectAllBtn = document.getElementById('select-all-colors');
+    const deselectAllBtn = document.getElementById('deselect-all-colors');
+    
+    if (!colorsGrid) return;
+    
+    // Limpar grid
+    colorsGrid.innerHTML = '';
+    
+    // Criar opção para cada cor
+    AVAILABLE_COLORS.forEach(color => {
+        const colorOption = document.createElement('div');
+        colorOption.className = 'color-option';
+        colorOption.dataset.colorName = color.name;
+        colorOption.dataset.colorHex = color.hex;
+        
+        const opacityStyle = color.opacity ? `opacity: ${color.opacity};` : '';
+        
+        colorOption.innerHTML = `
+            <input type="checkbox" class="color-checkbox" id="color-${color.name}" value="${color.name}">
+            <div class="color-preview" style="background-color: ${color.hex}; ${opacityStyle}"></div>
+            <span class="color-label">${color.name}</span>
+        `;
+        
+        // Evento de clique para selecionar/deselecionar
+        colorOption.addEventListener('click', function(e) {
+            if (e.target.type === 'checkbox') return;
+            
+            const checkbox = this.querySelector('.color-checkbox');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                this.classList.add('selected');
+                addSelectedColor(color.name, color.hex);
+            } else {
+                this.classList.remove('selected');
+                removeSelectedColor(color.name);
+            }
+            
+            updateSelectedColorsPreview();
+        });
+        
+        colorsGrid.appendChild(colorOption);
+    });
+    
+    // Botão para selecionar todas as cores
+    if (selectAllBtn) {
+        selectAllBtn.addEventListener('click', function() {
+            selectedColors = [...AVAILABLE_COLORS];
+            updateColorSelectionUI();
+        });
+    }
+    
+    // Botão para limpar seleção
+    if (deselectAllBtn) {
+        deselectAllBtn.addEventListener('click', function() {
+            selectedColors = [];
+            updateColorSelectionUI();
+        });
+    }
+}
+
+// Função para adicionar cor à lista de selecionadas
+function addSelectedColor(name, hex) {
+    if (!selectedColors.some(c => c.name === name)) {
+        selectedColors.push({ name, hex });
+    }
+}
+
+// Função para remover cor da lista de selecionadas
+function removeSelectedColor(name) {
+    selectedColors = selectedColors.filter(c => c.name !== name);
+}
+
+// Atualizar a UI de seleção de cores
+function updateColorSelectionUI() {
+    // Atualizar checkboxes
+    document.querySelectorAll('.color-option').forEach(option => {
+        const colorName = option.dataset.colorName;
+        const checkbox = option.querySelector('.color-checkbox');
+        const isSelected = selectedColors.some(c => c.name === colorName);
+        
+        checkbox.checked = isSelected;
+        if (isSelected) {
+            option.classList.add('selected');
+        } else {
+            option.classList.remove('selected');
+        }
+    });
+    
+    updateSelectedColorsPreview();
+}
+
+// Atualizar preview das cores selecionadas
+function updateSelectedColorsPreview() {
+    const selectedColorsChips = document.getElementById('selected-colors-chips');
+    const noColorsText = document.querySelector('.no-colors-selected');
+    
+    if (!selectedColorsChips) return;
+    
+    // Limpar preview
+    selectedColorsChips.innerHTML = '';
+    
+    if (selectedColors.length === 0) {
+        if (noColorsText) noColorsText.style.display = 'block';
+        return;
+    }
+    
+    if (noColorsText) noColorsText.style.display = 'none';
+    
+    // Adicionar chips para cada cor selecionada
+    selectedColors.forEach(color => {
+        const chip = document.createElement('span');
+        chip.className = 'selected-color-chip';
+        chip.innerHTML = `
+            <div class="color-chip-preview" style="background-color: ${color.hex}"></div>
+            ${color.name}
+        `;
+        selectedColorsChips.appendChild(chip);
+    });
 }
 
 // ========================================================================
@@ -244,7 +420,7 @@ function showSecurityStatus() {
 function validateProductForm(productData) {
     const errors = [];
     
-    // 1. VALIDAÇÃO DO NOME
+    // 1. VALIDAÇÃO DO NOME (OBRIGATÓRIO)
     if (!productData.name || productData.name.trim().length === 0) {
         errors.push('O nome do produto é obrigatório');
     } else if (productData.name.trim().length < 3) {
@@ -255,7 +431,7 @@ function validateProductForm(productData) {
         errors.push('O nome não pode conter apenas números');
     }
     
-    // 2. VALIDAÇÃO DA DESCRIÇÃO
+    // 2. VALIDAÇÃO DA DESCRIÇÃO (OBRIGATÓRIA)
     if (!productData.description || productData.description.trim().length === 0) {
         errors.push('A descrição do produto é obrigatória');
     } else if (productData.description.trim().length < 10) {
@@ -264,20 +440,20 @@ function validateProductForm(productData) {
         errors.push('A descrição deve ter no máximo 1000 caracteres');
     }
     
-    // 3. VALIDAÇÃO DO PREÇO
+    // 3. VALIDAÇÃO DO PREÇO (OBRIGATÓRIO)
     if (!productData.price && productData.price !== 0) {
         errors.push('O preço do produto é obrigatório');
     } else if (isNaN(productData.price)) {
         errors.push('O preço deve ser um número válido');
-    } else if (productData.price < 0) {
-        errors.push('O preço não pode ser negativo');
+    } else if (productData.price <= 0) {
+        errors.push('O preço deve ser maior que zero');
     } else if (productData.price > 100000) {
         errors.push('O preço máximo é R$ 100.000,00');
     } else if (productData.price.toString().split('.')[1]?.length > 2) {
         errors.push('O preço deve ter no máximo 2 casas decimais');
     }
     
-    // 4. VALIDAÇÃO DA CATEGORIA
+    // 4. VALIDAÇÃO DA CATEGORIA (OBRIGATÓRIA)
     const validCategories = ['decoracao', 'utilitarios', 'prototipos', 'joias', 'brinquedos', 
                             'ferramentas', 'automotivo', 'medico', 'arquitetura', 'educacao', 
                             'moda', 'esportes', 'personalizado'];
@@ -287,32 +463,38 @@ function validateProductForm(productData) {
         errors.push('Selecione uma categoria válida');
     }
     
-    // 5. VALIDAÇÃO DAS DIMENSÕES (opcional)
+    // 5. VALIDAÇÃO DAS DIMENSÕES (OPCIONAL)
     if (productData.dimensions && productData.dimensions.trim().length > 0) {
-        if (productData.dimensions.trim().length > 50) {
+        const dimensionsValidation = validateDimensions(productData.dimensions);
+        
+        if (!dimensionsValidation.isValid) {
+            errors.push(dimensionsValidation.error);
+        } else if (productData.dimensions.trim().length > 50) {
             errors.push('As dimensões devem ter no máximo 50 caracteres');
         }
-        // Validação de formato: deve conter números e 'x' ou vírgula
-        const dimensionRegex = /^[\d\s,.xX×]+(cm|mm|m|in|")?$/;
-        if (!dimensionRegex.test(productData.dimensions)) {
-            errors.push('Formato de dimensões inválido. Use formato como: 10x15x5 cm');
-        }
     }
     
-    // 6. VALIDAÇÃO DO MATERIAL (opcional)
-    if (productData.material && productData.material.trim().length > 0) {
-        if (productData.material.trim().length > 100) {
-            errors.push('O material deve ter no máximo 100 caracteres');
-        }
+    // 6. VALIDAÇÃO DO MATERIAL (OBRIGATÓRIO)
+    if (!productData.material || productData.material.trim().length === 0) {
+        errors.push('O material do produto é obrigatório');
+    } else if (productData.material.trim().length > 100) {
+        errors.push('O material deve ter no máximo 100 caracteres');
     }
     
-    // 7. VALIDAÇÃO DO PESO (opcional)
-    if (productData.weight !== null && productData.weight !== undefined && productData.weight !== '') {
+    // 7. VALIDAÇÃO DAS CORES DISPONÍVEIS (OBRIGATÓRIO)
+    if (!productData.colors || productData.colors.length === 0) {
+        errors.push('Selecione pelo menos uma cor disponível');
+    }
+    
+    // 8. VALIDAÇÃO DO PESO (OBRIGATÓRIO)
+    if (productData.weight === null || productData.weight === undefined || productData.weight === '') {
+        errors.push('O peso do produto é obrigatório');
+    } else {
         const weight = parseFloat(productData.weight);
         if (isNaN(weight)) {
             errors.push('O peso deve ser um número válido');
-        } else if (weight < 0) {
-            errors.push('O peso não pode ser negativo');
+        } else if (weight <= 0) {
+            errors.push('O peso deve ser maior que zero');
         } else if (weight > 10000) {
             errors.push('O peso máximo é 10.000g (10kg)');
         } else if (weight % 1 !== 0 && weight.toString().split('.')[1]?.length > 1) {
@@ -320,21 +502,21 @@ function validateProductForm(productData) {
         }
     }
     
-    // 8. VALIDAÇÃO DO TEMPO DE IMPRESSÃO (opcional)
-    if (productData.printTime && productData.printTime.trim().length > 0) {
-        if (productData.printTime.trim().length > 50) {
-            errors.push('O tempo de impressão deve ter no máximo 50 caracteres');
-        }
+    // 9. VALIDAÇÃO DO TEMPO DE IMPRESSÃO (OBRIGATÓRIO)
+    if (!productData.printTime || productData.printTime.trim().length === 0) {
+        errors.push('O tempo de impressão é obrigatório');
+    } else if (productData.printTime.trim().length > 50) {
+        errors.push('O tempo de impressão deve ter no máximo 50 caracteres');
     }
     
-    // 9. VALIDAÇÃO DAS ESPECIFICAÇÕES TÉCNICAS (opcional)
+    // 10. VALIDAÇÃO DAS ESPECIFICAÇÕES TÉCNICAS (OPCIONAL)
     if (productData.specifications && productData.specifications.trim().length > 0) {
         if (productData.specifications.trim().length > 2000) {
             errors.push('As especificações técnicas devem ter no máximo 2000 caracteres');
         }
     }
     
-    // 10. VALIDAÇÃO DAS IMAGENS
+    // 11. VALIDAÇÃO DAS IMAGENS
     if (productFiles.length > 10) {
         errors.push('Máximo de 10 imagens por produto');
     }
@@ -438,8 +620,8 @@ function setupRealTimeValidation() {
                 error = 'O preço é obrigatório';
             } else if (isNaN(numericValue)) {
                 error = 'Digite um número válido';
-            } else if (numericValue < 0) {
-                error = 'O preço não pode ser negativo';
+            } else if (numericValue <= 0) {
+                error = 'O preço deve ser maior que zero';
             } else if (numericValue > 100000) {
                 error = 'Preço máximo: R$ 100.000,00';
             } else if (parts.length === 2 && parts[1].length > 2) {
@@ -481,21 +663,71 @@ function setupRealTimeValidation() {
     // 5. VALIDAÇÃO DAS DIMENSÕES
     const dimensionsInput = document.getElementById('product-dimensions');
     if (dimensionsInput) {
+        // Adicionar placeholder explicativo
+        dimensionsInput.placeholder = "Ex: 10x15x5 cm (largura x altura x profundidade)";
+        
         dimensionsInput.addEventListener('input', function(e) {
-            const value = e.target.value.trim();
-            let error = '';
+            let value = e.target.value.trim();
             
-            if (value.length > 50) {
-                error = 'Máximo 50 caracteres';
-            } else if (value.length > 0) {
-                const dimensionRegex = /^[\d\s,.xX×]+(cm|mm|m|in|")?$/;
-                if (!dimensionRegex.test(value)) {
-                    error = 'Use formato: 10x15x5 cm';
-                }
+            // Formatação automática enquanto digita
+            value = formatDimensionsWhileTyping(value);
+            
+            // Atualizar o valor formatado
+            e.target.value = value;
+            
+            // Validação
+            let error = '';
+            const validation = validateDimensions(value);
+            
+            if (value.length === 0) {
+                // Campo vazio é válido (opcional)
+                e.target.classList.remove('invalid');
+                e.target.classList.remove('valid');
+            } else if (!validation.isValid) {
+                error = validation.error;
+                e.target.classList.add('invalid');
+                e.target.classList.remove('valid');
+            } else {
+                // Formato válido
+                e.target.classList.remove('invalid');
+                e.target.classList.add('valid');
+                
+                // Mostrar dimensões formatadas como preview
+                showDimensionsPreview(validation.formatted);
             }
             
+            // Atualizar mensagem de erro
             updateFieldValidation('product-dimensions', value, error);
             updateCharacterCounter('product-dimensions', value.length, 50);
+        });
+        
+        // Formatação final ao perder o foco
+        dimensionsInput.addEventListener('blur', function() {
+            let value = this.value.trim();
+            
+            if (value.length > 0) {
+                const validation = validateDimensions(value);
+                
+                if (validation.isValid) {
+                    // Aplicar formatação final
+                    this.value = validation.formatted;
+                    
+                    // Mostrar preview bonito
+                    showDimensionsPreview(validation.formatted);
+                } else {
+                    // Mostrar exemplo de formato correto
+                    showFieldError('product-dimensions', 
+                        'Formato inválido. Use: 10x15x5 cm ou 10 x 15 x 5 cm');
+                }
+            } else {
+                // Limpar preview se campo estiver vazio
+                hideDimensionsPreview();
+            }
+        });
+        
+        // Mostrar dicas ao focar no campo
+        dimensionsInput.addEventListener('focus', function() {
+            showDimensionsTips();
         });
     }
     
@@ -538,11 +770,13 @@ function setupRealTimeValidation() {
             if (value.length > 0) {
                 if (isNaN(numericValue)) {
                     error = 'Digite um número válido';
-                } else if (numericValue < 0) {
-                    error = 'O peso não pode ser negativo';
+                } else if (numericValue <= 0) {
+                    error = 'O peso deve ser maior que zero';
                 } else if (numericValue > 10000) {
                     error = 'Peso máximo: 10.000g';
                 }
+            } else {
+                error = 'O peso é obrigatório';
             }
             
             updateFieldValidation('product-weight', value, error);
@@ -568,6 +802,198 @@ function setupRealTimeValidation() {
             const error = value.length > 2000 ? 'Máximo 2000 caracteres' : '';
             updateFieldValidation('product-specifications', value, error);
             updateCharacterCounter('product-specifications', value.length, 2000);
+        });
+    }
+}
+
+// Função para validar dimensões
+function validateDimensions(dimensions) {
+    // Se estiver vazio, é válido (campo opcional)
+    if (!dimensions || dimensions.trim().length === 0) {
+        return { isValid: true, formatted: '' };
+    }
+    
+    // Padrões aceitos:
+    // 1. 10x15x5
+    // 2. 10x15x5 cm
+    // 3. 10 x 15 x 5
+    // 4. 10 x 15 x 5 cm
+    // 5. 10,15,5
+    // 6. 10,15,5 cm
+    const patterns = [
+        /^(\d+(?:\.\d+)?)\s*[xX×,]\s*(\d+(?:\.\d+)?)\s*[xX×,]\s*(\d+(?:\.\d+)?)(?:\s*(cm|mm|m|in|"|''))?$/i,
+        /^(\d+(?:\.\d+)?)\s*[xX]\s*(\d+(?:\.\d+)?)\s*[xX]\s*(\d+(?:\.\d+)?)(?:\s*(cm|mm|m|in|"|''))?$/i
+    ];
+    
+    let match = null;
+    for (const pattern of patterns) {
+        match = dimensions.match(pattern);
+        if (match) break;
+    }
+    
+    if (!match) {
+        return {
+            isValid: false,
+            error: 'Formato inválido. Use: Largura x Altura x Profundidade (ex: 10x15x5 cm)'
+        };
+    }
+    
+    // Extrair valores
+    const width = parseFloat(match[1]);
+    const height = parseFloat(match[2]);
+    const depth = parseFloat(match[3]);
+    const unit = match[4] || 'cm'; // Padrão é cm se não especificado
+    
+    // Validar valores numéricos
+    if (isNaN(width) || isNaN(height) || isNaN(depth)) {
+        return {
+            isValid: false,
+            error: 'Valores devem ser números (ex: 10.5x15.2x5)'
+        };
+    }
+    
+    // Validar se valores são positivos
+    if (width <= 0 || height <= 0 || depth <= 0) {
+        return {
+            isValid: false,
+            error: 'As dimensões devem ser valores positivos maiores que zero'
+        };
+    }
+    
+    // Validar tamanho máximo razoável (10 metros)
+    if (width > 1000 || height > 1000 || depth > 1000) {
+        return {
+            isValid: false,
+            error: 'As dimensões são muito grandes. Máximo: 1000cm (10m)'
+        };
+    }
+    
+    // Formatar para saída padronizada
+    const formatted = `${width} × ${height} × ${depth} ${unit}`;
+    
+    return {
+        isValid: true,
+        formatted: formatted,
+        width: width,
+        height: height,
+        depth: depth,
+        unit: unit
+    };
+}
+
+// Função para formatar enquanto digita
+function formatDimensionsWhileTyping(input) {
+    // Remove múltiplos espaços
+    let formatted = input.replace(/\s+/g, ' ');
+    
+    // Garante que há espaços ao redor do "x" para melhor legibilidade
+    formatted = formatted.replace(/(\d)\s*[xX×,]\s*(\d)/g, '$1 × $2');
+    
+    // Garante espaço antes da unidade
+    formatted = formatted.replace(/(\d)(cm|mm|m|in|"|'')/gi, '$1 $2');
+    
+    return formatted;
+}
+
+// Função para mostrar preview das dimensões
+function showDimensionsPreview(formattedDimensions) {
+    let previewElement = document.getElementById('dimensions-preview');
+    if (!previewElement) {
+        previewElement = document.createElement('div');
+        previewElement.id = 'dimensions-preview';
+        previewElement.className = 'dimensions-preview';
+        dimensionsInput.parentNode.appendChild(previewElement);
+    }
+    
+    // Parse das dimensões para mostrar bonito
+    const parts = formattedDimensions.split(' × ');
+    if (parts.length === 3) {
+        const [width, heightDepth] = parts;
+        const [height, depthUnit] = heightDepth.split(' ');
+        const [depth, unit] = depthUnit ? [depthUnit.replace(/[^\d.]/g, ''), depthUnit.replace(/[\d.]/g, '')] : ['', ''];
+        
+        previewElement.innerHTML = `
+            <div class="dimensions-preview-content">
+                <strong>Dimensões formatadas:</strong>
+                <div class="dimensions-visual">
+                    <div class="dimension-item">
+                        <span class="dimension-label">Largura:</span>
+                        <span class="dimension-value">${width} ${unit || 'cm'}</span>
+                    </div>
+                    <div class="dimension-item">
+                        <span class="dimension-label">Altura:</span>
+                        <span class="dimension-value">${height} ${unit || 'cm'}</span>
+                    </div>
+                    <div class="dimension-item">
+                        <span class="dimension-label">Profundidade:</span>
+                        <span class="dimension-value">${depth} ${unit || 'cm'}</span>
+                    </div>
+                </div>
+                <small class="dimensions-help">Largura × Altura × Profundidade</small>
+            </div>
+        `;
+        previewElement.style.display = 'block';
+    } else {
+        previewElement.innerHTML = `<strong>Formato reconhecido:</strong> ${formattedDimensions}`;
+        previewElement.style.display = 'block';
+    }
+}
+
+// Função para esconder o preview
+function hideDimensionsPreview() {
+    const previewElement = document.getElementById('dimensions-preview');
+    if (previewElement) {
+        previewElement.style.display = 'none';
+    }
+}
+
+// Função para mostrar dicas de formato
+function showDimensionsTips() {
+    // Criar tooltip de dicas se não existir
+    if (!document.getElementById('dimensions-tips')) {
+        const tips = document.createElement('div');
+        tips.id = 'dimensions-tips';
+        tips.className = 'dimensions-tips';
+        tips.innerHTML = `
+            <h4>📏 Formato das Dimensões</h4>
+            <p><strong>Como preencher:</strong></p>
+            <ul>
+                <li>✓ Use o formato: <code>Largura × Altura × Profundidade</code></li>
+                <li>✓ Separe com "x", "×" ou ","</li>
+                <li>✓ Pode usar ou não espaços</li>
+                <li>✓ A unidade (cm, mm, m) é opcional</li>
+                <li>✓ Pode usar números decimais (ex: 10.5)</li>
+            </ul>
+            <p><strong>Exemplos válidos:</strong></p>
+            <div class="dimensions-examples">
+                <code>10x15x5</code>
+                <code>10 x 15 x 5</code>
+                <code>10.5×15.2×5.3</code>
+                <code>10,15,5 cm</code>
+                <code>10x15x5 mm</code>
+                <code>0.5×0.3×0.2 m</code>
+            </div>
+            <p><small>O sistema formatará automaticamente para: <strong>10 × 15 × 5 cm</strong></small></p>
+        `;
+        
+        const dimensionsGroup = dimensionsInput.closest('.form-group');
+        dimensionsGroup.appendChild(tips);
+        
+        // Remover tooltip após 15 segundos ou ao clicar fora
+        setTimeout(() => {
+            if (tips.parentNode) {
+                tips.remove();
+            }
+        }, 15000);
+        
+        // Remover ao clicar em qualquer lugar
+        document.addEventListener('click', function removeTips(e) {
+            if (!dimensionsGroup.contains(e.target)) {
+                if (tips.parentNode) {
+                    tips.remove();
+                }
+                document.removeEventListener('click', removeTips);
+            }
         });
     }
 }
@@ -941,6 +1367,8 @@ async function handleFormSubmit(e) {
         category: document.getElementById('product-category').value,
         dimensions: document.getElementById('product-dimensions').value.trim(),
         material: document.getElementById('product-material').value.trim(),
+        // NOVO: Coletar cores selecionadas
+        colors: selectedColors.map(c => c.name), // Apenas os nomes
         weight: document.getElementById('product-weight').value ? 
                 parseFloat(document.getElementById('product-weight').value) : null,
         printTime: document.getElementById('product-print-time').value.trim(),
@@ -964,6 +1392,14 @@ async function handleFormSubmit(e) {
                 document.getElementById('product-price').classList.add('invalid');
             } else if (error.includes('categoria')) {
                 document.getElementById('product-category').classList.add('invalid');
+            } else if (error.includes('material')) {
+                document.getElementById('product-material').classList.add('invalid');
+            } else if (error.includes('cor')) {
+                document.getElementById('colors-selector-container').classList.add('invalid');
+            } else if (error.includes('peso')) {
+                document.getElementById('product-weight').classList.add('invalid');
+            } else if (error.includes('tempo')) {
+                document.getElementById('product-print-time').classList.add('invalid');
             }
         });
         
@@ -1043,6 +1479,10 @@ function resetProductForm() {
     productFiles = [];
     editingProductId = null;
     
+    // NOVO: Limpar seleção de cores
+    selectedColors = [];
+    updateColorSelectionUI();
+    
     // Resetar contadores
     document.querySelectorAll('.character-counter').forEach(counter => {
         counter.textContent = '0/0 caracteres';
@@ -1055,6 +1495,12 @@ function resetProductForm() {
         field.style.borderColor = '';
     });
     
+    // Resetar validação do seletor de cores
+    const colorsContainer = document.getElementById('colors-selector-container');
+    if (colorsContainer) {
+        colorsContainer.classList.remove('invalid');
+    }
+    
     // Ocultar mensagens de erro
     document.querySelectorAll('.field-error').forEach(error => {
         error.style.display = 'none';
@@ -1063,6 +1509,9 @@ function resetProductForm() {
     // Remover preview do preço
     const pricePreview = document.getElementById('price-preview');
     if (pricePreview) pricePreview.style.display = 'none';
+    
+    // Remover preview das dimensões
+    hideDimensionsPreview();
     
     hideFormValidationMessage();
     
@@ -1104,6 +1553,18 @@ function handleEditProduct(id) {
     updateCharacterCounter('product-material', (product.material || '').length, 100);
     updateCharacterCounter('product-print-time', (product.printTime || '').length, 50);
     updateCharacterCounter('product-specifications', (product.specifications || '').length, 2000);
+    
+    // NOVO: Carregar cores selecionadas
+    if (product.colors && Array.isArray(product.colors)) {
+        selectedColors = product.colors.map(colorName => {
+            const colorInfo = AVAILABLE_COLORS.find(c => c.name === colorName);
+            return colorInfo || { name: colorName, hex: '#e0e0e0' };
+        });
+        updateColorSelectionUI();
+    } else {
+        selectedColors = [];
+        updateColorSelectionUI();
+    }
     
     // Limpar e preencher preview de imagens
     previewContainer.innerHTML = '';
@@ -1268,6 +1729,22 @@ function createAdminProductCard(product) {
         `;
     }
     
+    // Adicionar cores ao card
+    let colorsHTML = '';
+    if (product.colors && product.colors.length > 0) {
+        colorsHTML = `
+            <div class="admin-product-colors">
+                <strong>Cores:</strong> 
+                <div class="admin-colors-chips">
+                    ${product.colors.slice(0, 5).map(color => `
+                        <span class="admin-color-chip" style="background-color: ${getColorHexFromName(color)}" title="${color}"></span>
+                    `).join('')}
+                    ${product.colors.length > 5 ? `<span class="more-colors">+${product.colors.length - 5}</span>` : ''}
+                </div>
+            </div>
+        `;
+    }
+    
     let specsHTML = `
         <div class="product-specs">
             ${product.dimensions ? `<div class="spec-item"><span class="spec-label">Dimensões:</span><span class="spec-value">${product.dimensions}</span></div>` : ''}
@@ -1290,11 +1767,18 @@ function createAdminProductCard(product) {
         </div>
         ${imagesHTML}
         <p>${product.description}</p>
+        ${colorsHTML}
         ${specsHTML}
         ${product.specifications ? `<p><strong>Técnico:</strong> ${product.specifications}</p>` : ''}
     `;
     
     return productCard;
+}
+
+// Função auxiliar para obter cor hexadecimal pelo nome
+function getColorHexFromName(colorName) {
+    const color = AVAILABLE_COLORS.find(c => c.name === colorName);
+    return color ? color.hex : '#e0e0e0';
 }
 
 // Função para renderizar a paginação
