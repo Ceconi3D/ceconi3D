@@ -491,6 +491,49 @@ footer {
     color: #ccc;
     font-size: 0.9rem;
 }
+/* Estilos específicos para acesso administrativo secreto */
+.admin-secret {
+    text-align: center;
+    margin-top: 10px;
+    opacity: 0.2;
+    font-size: 0.7rem;
+    transition: var(--transition);
+    cursor: default;
+}
+
+.admin-secret:hover {
+    opacity: 0.3;
+}
+
+.admin-micro-icon {
+    color: var(--gray);
+    text-decoration: none;
+    margin: 0 5px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: var(--transition);
+}
+
+.admin-micro-icon:hover {
+    opacity: 0.8;
+}
+
+.admin-micro-icon i {
+    font-size: 0.7rem;
+}
+
+.admin-secret-dot {
+    color: rgba(255,255,255,0.05);
+    cursor: pointer;
+    user-select: none;
+    margin: 0 5px;
+    font-size: 1.2rem;
+    transition: var(--transition);
+}
+
+.admin-secret-dot:hover {
+    color: rgba(255,255,255,0.1);
+}
 /* Área Administrativa */
 .admin-panel {
     display: none;
