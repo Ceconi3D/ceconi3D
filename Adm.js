@@ -238,78 +238,116 @@ function showSecurityStatus() {
 }
 
 // ========================================================================
-// === VALIDAÇÕES DE PRODUTO
+// === VALIDAÇÕES DE PRODUTO - COMPLETA
 // ========================================================================
 
 function validateProductForm(productData) {
     const errors = [];
     
-    // Validação do nome
-    if (!productData.name || productData.name.trim().length < 2) {
-        errors.push('O nome do produto deve ter pelo menos 2 caracteres');
+    // 1. VALIDAÇÃO DO NOME
+    if (!productData.name || productData.name.trim().length === 0) {
+        errors.push('O nome do produto é obrigatório');
+    } else if (productData.name.trim().length < 3) {
+        errors.push('O nome deve ter pelo menos 3 caracteres');
+    } else if (productData.name.trim().length > 100) {
+        errors.push('O nome deve ter no máximo 100 caracteres');
+    } else if (/^\d+$/.test(productData.name.trim())) {
+        errors.push('O nome não pode conter apenas números');
     }
     
-    if (productData.name && productData.name.trim().length > 100) {
-        errors.push('O nome do produto deve ter no máximo 100 caracteres');
-    }
-    
-    // Validação da descrição
-    if (!productData.description || productData.description.trim().length < 10) {
+    // 2. VALIDAÇÃO DA DESCRIÇÃO
+    if (!productData.description || productData.description.trim().length === 0) {
+        errors.push('A descrição do produto é obrigatória');
+    } else if (productData.description.trim().length < 10) {
         errors.push('A descrição deve ter pelo menos 10 caracteres');
-    }
-    
-    if (productData.description && productData.description.trim().length > 1000) {
+    } else if (productData.description.trim().length > 1000) {
         errors.push('A descrição deve ter no máximo 1000 caracteres');
     }
     
-    // Validação do preço
-    if (!productData.price || isNaN(productData.price)) {
+    // 3. VALIDAÇÃO DO PREÇO
+    if (!productData.price && productData.price !== 0) {
+        errors.push('O preço do produto é obrigatório');
+    } else if (isNaN(productData.price)) {
         errors.push('O preço deve ser um número válido');
     } else if (productData.price < 0) {
         errors.push('O preço não pode ser negativo');
     } else if (productData.price > 100000) {
-        errors.push('O preço não pode ser superior a R$ 100.000,00');
+        errors.push('O preço máximo é R$ 100.000,00');
     } else if (productData.price.toString().split('.')[1]?.length > 2) {
         errors.push('O preço deve ter no máximo 2 casas decimais');
     }
     
-    // Validação da categoria
-    const validCategories = ['decoracao', 'utilitarios', 'prototipos', 'joias', 'brinquedos', 'ferramentas', 'automotivo', 'medico', 'arquitetura', 'educacao', 'moda', 'esportes', 'personalizado'];
-    if (!productData.category || !validCategories.includes(productData.category)) {
+    // 4. VALIDAÇÃO DA CATEGORIA
+    const validCategories = ['decoracao', 'utilitarios', 'prototipos', 'joias', 'brinquedos', 
+                            'ferramentas', 'automotivo', 'medico', 'arquitetura', 'educacao', 
+                            'moda', 'esportes', 'personalizado'];
+    if (!productData.category || productData.category.trim().length === 0) {
+        errors.push('A categoria do produto é obrigatória');
+    } else if (!validCategories.includes(productData.category)) {
         errors.push('Selecione uma categoria válida');
     }
     
-    // Validação das dimensões
-    if (productData.dimensions && productData.dimensions.length > 50) {
-        errors.push('As dimensões devem ter no máximo 50 caracteres');
+    // 5. VALIDAÇÃO DAS DIMENSÕES (opcional)
+    if (productData.dimensions && productData.dimensions.trim().length > 0) {
+        if (productData.dimensions.trim().length > 50) {
+            errors.push('As dimensões devem ter no máximo 50 caracteres');
+        }
+        // Validação de formato: deve conter números e 'x' ou vírgula
+        const dimensionRegex = /^[\d\s,.xX×]+(cm|mm|m|in|")?$/;
+        if (!dimensionRegex.test(productData.dimensions)) {
+            errors.push('Formato de dimensões inválido. Use formato como: 10x15x5 cm');
+        }
     }
     
-    // Validação do material
-    if (productData.material && productData.material.length > 100) {
-        errors.push('O material deve ter no máximo 100 caracteres');
+    // 6. VALIDAÇÃO DO MATERIAL (opcional)
+    if (productData.material && productData.material.trim().length > 0) {
+        if (productData.material.trim().length > 100) {
+            errors.push('O material deve ter no máximo 100 caracteres');
+        }
     }
     
-    // Validação do peso
-    if (productData.weight && (isNaN(productData.weight) || productData.weight < 0)) {
-        errors.push('O peso deve ser um número positivo');
-    } else if (productData.weight && productData.weight > 10000) {
-        errors.push('O peso não pode ser superior a 10.000g');
+    // 7. VALIDAÇÃO DO PESO (opcional)
+    if (productData.weight !== null && productData.weight !== undefined && productData.weight !== '') {
+        const weight = parseFloat(productData.weight);
+        if (isNaN(weight)) {
+            errors.push('O peso deve ser um número válido');
+        } else if (weight < 0) {
+            errors.push('O peso não pode ser negativo');
+        } else if (weight > 10000) {
+            errors.push('O peso máximo é 10.000g (10kg)');
+        } else if (weight % 1 !== 0 && weight.toString().split('.')[1]?.length > 1) {
+            errors.push('O peso deve ter no máximo 1 casa decimal');
+        }
     }
     
-    // Validação do tempo de impressão
-    if (productData.printTime && productData.printTime.length > 50) {
-        errors.push('O tempo de impressão deve ter no máximo 50 caracteres');
+    // 8. VALIDAÇÃO DO TEMPO DE IMPRESSÃO (opcional)
+    if (productData.printTime && productData.printTime.trim().length > 0) {
+        if (productData.printTime.trim().length > 50) {
+            errors.push('O tempo de impressão deve ter no máximo 50 caracteres');
+        }
     }
     
-    // Validação das especificações técnicas
-    if (productData.specifications && productData.specifications.length > 2000) {
-        errors.push('As especificações técnicas devem ter no máximo 2000 caracteres');
+    // 9. VALIDAÇÃO DAS ESPECIFICAÇÕES TÉCNICAS (opcional)
+    if (productData.specifications && productData.specifications.trim().length > 0) {
+        if (productData.specifications.trim().length > 2000) {
+            errors.push('As especificações técnicas devem ter no máximo 2000 caracteres');
+        }
     }
     
-    // Validação das imagens
+    // 10. VALIDAÇÃO DAS IMAGENS
     if (productFiles.length > 10) {
-        errors.push('Máximo de 10 imagens permitidas por produto');
+        errors.push('Máximo de 10 imagens por produto');
     }
+    
+    // Validar cada arquivo individualmente
+    productFiles.forEach((file, index) => {
+        if (file.size > 5 * 1024 * 1024) { // 5MB
+            errors.push(`Imagem ${index + 1} excede 5MB: ${file.name}`);
+        }
+        if (!file.type.match(/^image\/(jpeg|jpg|png|gif|webp)$/)) {
+            errors.push(`Formato inválido para imagem ${index + 1}: ${file.name}. Use JPG, PNG ou GIF`);
+        }
+    });
     
     return {
         isValid: errors.length === 0,
@@ -318,11 +356,59 @@ function validateProductForm(productData) {
 }
 
 // ========================================================================
-// === VALIDAÇÕES EM TEMPO REAL NOS CAMPOS
+// === VALIDAÇÕES EM TEMPO REAL NOS CAMPOS - MELHORADA
 // ========================================================================
 
 function setupRealTimeValidation() {
-    // Validação do preço em tempo real
+    // 1. VALIDAÇÃO DO NOME
+    const nameInput = document.getElementById('product-name');
+    if (nameInput) {
+        nameInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            let error = '';
+            
+            if (value.length === 0) {
+                error = 'O nome é obrigatório';
+            } else if (value.length < 3) {
+                error = 'Mínimo 3 caracteres';
+            } else if (value.length > 100) {
+                error = 'Máximo 100 caracteres';
+            } else if (/^\d+$/.test(value)) {
+                error = 'Não pode conter apenas números';
+            }
+            
+            updateFieldValidation('product-name', value, error);
+            updateCharacterCounter('product-name', value.length, 100);
+        });
+        
+        nameInput.addEventListener('blur', function() {
+            if (this.value.trim().length < 3 && this.value.trim().length > 0) {
+                showFieldError('product-name', 'Nome muito curto. Mínimo 3 caracteres.');
+            }
+        });
+    }
+    
+    // 2. VALIDAÇÃO DA DESCRIÇÃO
+    const descriptionInput = document.getElementById('product-description');
+    if (descriptionInput) {
+        descriptionInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            let error = '';
+            
+            if (value.length === 0) {
+                error = 'A descrição é obrigatória';
+            } else if (value.length < 10) {
+                error = 'Mínimo 10 caracteres';
+            } else if (value.length > 1000) {
+                error = 'Máximo 1000 caracteres';
+            }
+            
+            updateFieldValidation('product-description', value, error);
+            updateCharacterCounter('product-description', value.length, 1000);
+        });
+    }
+    
+    // 3. VALIDAÇÃO DO PREÇO
     const priceInput = document.getElementById('product-price');
     if (priceInput) {
         priceInput.addEventListener('input', function(e) {
@@ -344,22 +430,87 @@ function setupRealTimeValidation() {
             
             e.target.value = value;
             
-            // Validação visual
+            // Validação
             const numericValue = parseFloat(value);
-            if (!isNaN(numericValue) && numericValue < 0) {
-                e.target.style.borderColor = 'var(--danger)';
-                showFieldError('product-price', 'O preço não pode ser negativo');
-            } else if (!isNaN(numericValue) && numericValue > 100000) {
-                e.target.style.borderColor = 'var(--danger)';
-                showFieldError('product-price', 'Preço máximo: R$ 100.000,00');
-            } else {
-                e.target.style.borderColor = '';
-                hideFieldError('product-price');
+            let error = '';
+            
+            if (value.length === 0) {
+                error = 'O preço é obrigatório';
+            } else if (isNaN(numericValue)) {
+                error = 'Digite um número válido';
+            } else if (numericValue < 0) {
+                error = 'O preço não pode ser negativo';
+            } else if (numericValue > 100000) {
+                error = 'Preço máximo: R$ 100.000,00';
+            } else if (parts.length === 2 && parts[1].length > 2) {
+                error = 'Máximo 2 casas decimais';
+            }
+            
+            updateFieldValidation('product-price', value, error);
+            
+            // Formatar visualmente
+            if (!isNaN(numericValue) && value.length > 0) {
+                const formattedValue = numericValue.toLocaleString('pt-BR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                // Mostrar valor formatado em tempo real (opcional)
+                showPricePreview(numericValue);
+            }
+        });
+        
+        // Formatar ao perder o foco
+        priceInput.addEventListener('blur', function() {
+            const value = parseFloat(this.value);
+            if (!isNaN(value)) {
+                this.value = value.toFixed(2);
             }
         });
     }
     
-    // Validação do peso em tempo real
+    // 4. VALIDAÇÃO DA CATEGORIA
+    const categoryInput = document.getElementById('product-category');
+    if (categoryInput) {
+        categoryInput.addEventListener('change', function(e) {
+            const value = e.target.value;
+            const error = value === '' ? 'Selecione uma categoria' : '';
+            updateFieldValidation('product-category', value, error);
+        });
+    }
+    
+    // 5. VALIDAÇÃO DAS DIMENSÕES
+    const dimensionsInput = document.getElementById('product-dimensions');
+    if (dimensionsInput) {
+        dimensionsInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            let error = '';
+            
+            if (value.length > 50) {
+                error = 'Máximo 50 caracteres';
+            } else if (value.length > 0) {
+                const dimensionRegex = /^[\d\s,.xX×]+(cm|mm|m|in|")?$/;
+                if (!dimensionRegex.test(value)) {
+                    error = 'Use formato: 10x15x5 cm';
+                }
+            }
+            
+            updateFieldValidation('product-dimensions', value, error);
+            updateCharacterCounter('product-dimensions', value.length, 50);
+        });
+    }
+    
+    // 6. VALIDAÇÃO DO MATERIAL
+    const materialInput = document.getElementById('product-material');
+    if (materialInput) {
+        materialInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            const error = value.length > 100 ? 'Máximo 100 caracteres' : '';
+            updateFieldValidation('product-material', value, error);
+            updateCharacterCounter('product-material', value.length, 100);
+        });
+    }
+    
+    // 7. VALIDAÇÃO DO PESO
     const weightInput = document.getElementById('product-weight');
     if (weightInput) {
         weightInput.addEventListener('input', function(e) {
@@ -368,79 +519,112 @@ function setupRealTimeValidation() {
             // Remove caracteres não numéricos, exceto ponto decimal
             value = value.replace(/[^\d.]/g, '');
             
+            // Garante que há apenas um ponto decimal
+            const parts = value.split('.');
+            if (parts.length > 2) {
+                value = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
+            // Limita a 1 casa decimal
+            if (parts.length === 2 && parts[1].length > 1) {
+                value = parts[0] + '.' + parts[1].substring(0, 1);
+            }
+            
+            e.target.value = value;
+            
             const numericValue = parseFloat(value);
-            if (!isNaN(numericValue) && numericValue < 0) {
-                e.target.style.borderColor = 'var(--danger)';
-                showFieldError('product-weight', 'O peso não pode ser negativo');
-            } else if (!isNaN(numericValue) && numericValue > 10000) {
-                e.target.style.borderColor = 'var(--danger)';
-                showFieldError('product-weight', 'Peso máximo: 10.000g');
-            } else {
-                e.target.style.borderColor = '';
-                hideFieldError('product-weight');
-            }
-        });
-    }
-    
-    // Validação de comprimento máximo para campos de texto
-    const textInputs = [
-        { id: 'product-name', max: 100 },
-        { id: 'product-dimensions', max: 50 },
-        { id: 'product-material', max: 100 },
-        { id: 'product-print-time', max: 50 }
-    ];
-    
-    textInputs.forEach(inputConfig => {
-        const input = document.getElementById(inputConfig.id);
-        if (input) {
-            input.addEventListener('input', function(e) {
-                if (e.target.value.length > inputConfig.max) {
-                    e.target.style.borderColor = 'var(--danger)';
-                    showFieldError(inputConfig.id, `Máximo de ${inputConfig.max} caracteres`);
-                } else {
-                    e.target.style.borderColor = '';
-                    hideFieldError(inputConfig.id);
+            let error = '';
+            
+            if (value.length > 0) {
+                if (isNaN(numericValue)) {
+                    error = 'Digite um número válido';
+                } else if (numericValue < 0) {
+                    error = 'O peso não pode ser negativo';
+                } else if (numericValue > 10000) {
+                    error = 'Peso máximo: 10.000g';
                 }
-                
-                // Atualizar contador de caracteres
-                updateCharacterCounter(inputConfig.id, e.target.value.length, inputConfig.max);
-            });
-        }
-    });
-    
-    // Validação especial para descrição
-    const descriptionInput = document.getElementById('product-description');
-    if (descriptionInput) {
-        descriptionInput.addEventListener('input', function(e) {
-            if (e.target.value.length < 10 && e.target.value.length > 0) {
-                e.target.style.borderColor = 'var(--warning)';
-                showFieldError('product-description', 'Mínimo 10 caracteres');
-            } else if (e.target.value.length > 1000) {
-                e.target.style.borderColor = 'var(--danger)';
-                showFieldError('product-description', 'Máximo 1000 caracteres');
-            } else {
-                e.target.style.borderColor = '';
-                hideFieldError('product-description');
             }
             
-            updateCharacterCounter('product-description', e.target.value.length, 1000);
+            updateFieldValidation('product-weight', value, error);
         });
     }
     
-    // Validação para especificações técnicas
-    const specsInput = document.getElementById('product-specifications');
-    if (specsInput) {
-        specsInput.addEventListener('input', function(e) {
-            if (e.target.value.length > 2000) {
-                e.target.style.borderColor = 'var(--danger)';
-                showFieldError('product-specifications', 'Máximo 2000 caracteres');
+    // 8. VALIDAÇÃO DO TEMPO DE IMPRESSÃO
+    const printTimeInput = document.getElementById('product-print-time');
+    if (printTimeInput) {
+        printTimeInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            const error = value.length > 50 ? 'Máximo 50 caracteres' : '';
+            updateFieldValidation('product-print-time', value, error);
+            updateCharacterCounter('product-print-time', value.length, 50);
+        });
+    }
+    
+    // 9. VALIDAÇÃO DAS ESPECIFICAÇÕES TÉCNICAS
+    const specificationsInput = document.getElementById('product-specifications');
+    if (specificationsInput) {
+        specificationsInput.addEventListener('input', function(e) {
+            const value = e.target.value.trim();
+            const error = value.length > 2000 ? 'Máximo 2000 caracteres' : '';
+            updateFieldValidation('product-specifications', value, error);
+            updateCharacterCounter('product-specifications', value.length, 2000);
+        });
+    }
+}
+
+// Função para atualizar a validação visual do campo
+function updateFieldValidation(fieldId, value, errorMessage = '') {
+    const field = document.getElementById(fieldId);
+    const errorElement = document.getElementById(`${fieldId}-error`);
+    
+    if (field) {
+        if (errorMessage) {
+            field.classList.add('invalid');
+            field.classList.remove('valid');
+            
+            if (errorElement) {
+                errorElement.textContent = errorMessage;
+                errorElement.style.display = 'block';
             } else {
-                e.target.style.borderColor = '';
-                hideFieldError('product-specifications');
+                // Criar elemento de erro se não existir
+                const newErrorElement = document.createElement('div');
+                newErrorElement.id = `${fieldId}-error`;
+                newErrorElement.className = 'field-error';
+                newErrorElement.textContent = errorMessage;
+                field.parentNode.appendChild(newErrorElement);
+            }
+        } else {
+            field.classList.remove('invalid');
+            if (value.length > 0) {
+                field.classList.add('valid');
             }
             
-            updateCharacterCounter('product-specifications', e.target.value.length, 2000);
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+    }
+}
+
+// Função para mostrar preview do preço formatado
+function showPricePreview(value) {
+    let previewElement = document.getElementById('price-preview');
+    if (!previewElement) {
+        previewElement = document.createElement('div');
+        previewElement.id = 'price-preview';
+        previewElement.className = 'price-preview';
+        priceInput.parentNode.appendChild(previewElement);
+    }
+    
+    if (!isNaN(value) && value > 0) {
+        const formatted = value.toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
         });
+        previewElement.textContent = `Valor: ${formatted}`;
+        previewElement.style.display = 'block';
+    } else {
+        previewElement.style.display = 'none';
     }
 }
 
@@ -459,6 +643,7 @@ function showFieldError(fieldId, message) {
     }
     errorElement.textContent = message;
     errorElement.style.display = 'block';
+    document.getElementById(fieldId).classList.add('invalid');
 }
 
 function hideFieldError(fieldId) {
@@ -466,6 +651,7 @@ function hideFieldError(fieldId) {
     if (errorElement) {
         errorElement.style.display = 'none';
     }
+    document.getElementById(fieldId).classList.remove('invalid');
 }
 
 function updateCharacterCounter(fieldId, currentLength, maxLength) {
@@ -762,10 +948,25 @@ async function handleFormSubmit(e) {
         images: []
     };
 
-    // 2. Validar dados
+    // 2. Validar dados COMPLETAMENTE
     const validation = validateProductForm(productData);
     if (!validation.isValid) {
         showFormValidationMessage(validation.errors.join('<br>'), 'error');
+        
+        // Destacar campos inválidos
+        validation.errors.forEach(error => {
+            // Extrair o campo do erro para destaque visual
+            if (error.includes('nome')) {
+                document.getElementById('product-name').classList.add('invalid');
+            } else if (error.includes('descrição')) {
+                document.getElementById('product-description').classList.add('invalid');
+            } else if (error.includes('preço')) {
+                document.getElementById('product-price').classList.add('invalid');
+            } else if (error.includes('categoria')) {
+                document.getElementById('product-category').classList.add('invalid');
+            }
+        });
+        
         return;
     }
 
@@ -848,8 +1049,9 @@ function resetProductForm() {
         counter.style.color = 'var(--gray)';
     });
     
-    // Resetar bordas dos campos
+    // Resetar classes de validação
     document.querySelectorAll('.form-control').forEach(field => {
+        field.classList.remove('invalid', 'valid');
         field.style.borderColor = '';
     });
     
@@ -857,6 +1059,10 @@ function resetProductForm() {
     document.querySelectorAll('.field-error').forEach(error => {
         error.style.display = 'none';
     });
+    
+    // Remover preview do preço
+    const pricePreview = document.getElementById('price-preview');
+    if (pricePreview) pricePreview.style.display = 'none';
     
     hideFormValidationMessage();
     
@@ -1202,6 +1408,13 @@ function setupImageUpload() {
             // Verificar tamanho do arquivo (máximo 5MB)
             if (file.size > 5 * 1024 * 1024) {
                 showMessage('Arquivo Muito Grande', 'A imagem deve ter no máximo 5MB.', 'error');
+                return;
+            }
+            
+            // Verificar formato válido
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                showMessage('Formato Inválido', 'Use apenas JPG, PNG, GIF ou WebP.', 'error');
                 return;
             }
             
