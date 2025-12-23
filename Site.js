@@ -1,9 +1,143 @@
 // Array global de produtos
 let products = [];
 
+// Variáveis para o clique duplo administrativo
+let adminClickCount = 0;
+let adminClickTimer = null;
+
+// Sistema de acesso administrativo secreto
+function setupAdminAccess() {
+    const adminIcon = document.getElementById('admin-icon');
+    const secretDot = document.getElementById('secret-dot');
+    
+    if (!adminIcon) {
+        console.warn('Ícone administrativo não encontrado');
+        return;
+    }
+    
+    // Sistema de clique duplo para o ícone de engrenagem
+    adminIcon.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        adminClickCount++;
+        
+        console.log(`Clique #${adminClickCount} no ícone administrativo`);
+        
+        // Limpar timer anterior
+        if (adminClickTimer) {
+            clearTimeout(adminClickTimer);
+        }
+        
+        if (adminClickCount === 1) {
+            // Primeiro clique - configurar timer
+            adminClickTimer = setTimeout(function() {
+                console.log('Timer expirado - resetando contagem');
+                adminClickCount = 0;
+                adminClickTimer = null;
+            }, 500); // 500ms para o segundo clique
+        } else if (adminClickCount === 2) {
+            // Segundo clique dentro do tempo - abrir admin
+            console.log('Clique duplo detectado - abrindo admin');
+            clearTimeout(adminClickTimer);
+            adminClickCount = 0;
+            adminClickTimer = null;
+            
+            // Pedir confirmação
+            if (confirm('Acessar painel administrativo?')) {
+                window.open('Adm.html', '_blank');
+            }
+        }
+    });
+    
+    // Sistema de clique triplo para o ponto secreto (opcional)
+    if (secretDot) {
+        let dotClickCount = 0;
+        let dotClickTimer = null;
+        
+        secretDot.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            dotClickCount++;
+            
+            console.log(`Clique #${dotClickCount} no ponto secreto`);
+            
+            // Limpar timer anterior
+            if (dotClickTimer) {
+                clearTimeout(dotClickTimer);
+            }
+            
+            if (dotClickCount === 3) {
+                // Terceiro clique - abrir admin
+                console.log('Clique triplo detectado - abrindo admin');
+                clearTimeout(dotClickTimer);
+                dotClickCount = 0;
+                dotClickTimer = null;
+                
+                // Feedback visual
+                secretDot.style.color = 'rgba(200, 166, 154, 0.5)';
+                setTimeout(() => {
+                    secretDot.style.color = 'rgba(255,255,255,0.05)';
+                }, 1000);
+                
+                // Pedir confirmação
+                if (confirm('Acessar área administrativa?')) {
+                    window.open('Adm.html', '_blank');
+                }
+            } else {
+                // Configurar timer para resetar
+                dotClickTimer = setTimeout(function() {
+                    console.log('Timer do ponto expirado - resetando');
+                    dotClickCount = 0;
+                    dotClickTimer = null;
+                }, 1000);
+            }
+        });
+    }
+    
+    // Código secreto por teclado (backup)
+    let keySequence = '';
+    const secretCode = 'admin333'; // Código secreto
+    
+    document.addEventListener('keydown', function(e) {
+        // Ignorar teclas especiais
+        if (e.ctrlKey || e.altKey || e.metaKey) return;
+        
+        // Adiciona a tecla pressionada à sequência
+        keySequence += e.key.toLowerCase();
+        
+        // Mantém apenas os últimos caracteres
+        if (keySequence.length > secretCode.length) {
+            keySequence = keySequence.substring(keySequence.length - secretCode.length);
+        }
+        
+        console.log(`Sequência de teclas: ${keySequence}`);
+        
+        // Verifica se a sequência bate com o código
+        if (keySequence === secretCode) {
+            console.log('Código secreto detectado!');
+            if (confirm('Código secreto aceito! Abrir painel administrativo?')) {
+                window.open('Adm.html', '_blank');
+            }
+            keySequence = ''; // Reseta
+        }
+        
+        // Reseta após 3 segundos de inatividade
+        clearTimeout(window.keyboardTimer);
+        window.keyboardTimer = setTimeout(function() {
+            keySequence = '';
+            console.log('Sequência de teclas resetada por inatividade');
+        }, 3000);
+    });
+}
+
 // Carregar produtos do Firebase
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('🚀 Iniciando carregamento de produtos...');
+    
+    // Configurar acesso administrativo primeiro
+    setupAdminAccess();
     
     // Aguardar o FirebaseService carregar
     const waitForFirebase = setInterval(() => {
