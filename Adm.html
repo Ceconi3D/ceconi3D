@@ -168,6 +168,29 @@
                             <textarea id="product-specifications" class="form-control" placeholder="Detalhes técnicos do produto" maxlength="2000"></textarea>
                             <div id="product-specifications-counter" class="character-counter"></div>
                         </div>
+                        <!-- NOVO CAMPO: CORES DISPONÍVEIS (COM CHECKBOXES) -->
+                        <div class="form-group">
+                            <label for="product-colors">Cores Disponíveis *</label>
+                            <div class="colors-selector-container" id="colors-selector-container">
+                                <div class="colors-grid" id="colors-grid">
+                                    <!-- As cores serão geradas dinamicamente via JavaScript -->
+                                </div>
+                                <div class="colors-selected-preview" id="colors-selected-preview">
+                                    <strong>Cores selecionadas:</strong>
+                                    <span class="no-colors-selected">Nenhuma cor selecionada</span>
+                                    <div class="selected-colors-chips" id="selected-colors-chips"></div>
+                                </div>
+                                <div class="colors-actions">
+                                    <button type="button" class="btn btn-outline btn-sm" id="select-all-colors">
+                                        <i class="fas fa-check-double"></i> Selecionar Todas
+                                    </button>
+                                    <button type="button" class="btn btn-outline btn-sm" id="deselect-all-colors">
+                                        <i class="fas fa-times"></i> Limpar Seleção
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="field-help">Selecione as cores disponíveis para este produto</div>
+                        </div>
                         
                         <div class="form-group">
                             <label>Imagens do Produto</label>
@@ -265,5 +288,4 @@
     <script src="firebase-service.js"></script>
     <script src="Adm.js"></script>
 </body>
-
 </html>
