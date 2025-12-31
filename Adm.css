@@ -3472,3 +3472,40 @@ textarea.form-control {
         grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }
+
+/* --- Adicionar ao final do Adm.css --- */
+
+/* Container da linha de cores no card do admin */
+.admin-product-colors {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espaço entre o texto "Cores:" e as bolinhas */
+}
+
+/* O grupo de bolinhas */
+.admin-colors-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px; /* Espaço entre cada bolinha */
+    align-items: center;
+}
+
+/* A bolinha individual */
+.admin-color-chip {
+    width: 20px;       /* Largura obrigatória */
+    height: 20px;      /* Altura obrigatória */
+    border-radius: 50%; /* Deixa redonda */
+    display: inline-block;
+    border: 1px solid rgba(0,0,0,0.2); /* Borda suave para cores claras */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+/* Texto "+4" caso tenha muitas cores */
+.more-colors {
+    font-size: 0.85rem;
+    color: var(--gray);
+    font-weight: 500;
+    margin-left: 2px;
+}
