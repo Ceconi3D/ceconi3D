@@ -6,6 +6,44 @@ let currentSearchTerm = '';
 let currentCategoryFilter = 'all';
 let currentSortBy = 'name-asc';
 
+// Mapa de cores para converter nomes em Hex (Copie isso para Site.js e TodosOsProdutos.js)
+const COLOR_MAP = {
+    "Branco": "#FFFFFF", "Preto": "#000000", "Cinza": "#808080", "Prata": "#C0C0C0",
+    "Vermelho": "#FF0000", "Vermelho Escuro": "#8B0000", "Vermelho Claro": "#FF6B6B",
+    "Azul": "#0000FF", "Azul Marinho": "#000080", "Azul Claro": "#ADD8E6", "Azul Turquesa": "#40E0D0",
+    "Verde": "#008000", "Verde Limão": "#32CD32", "Verde Claro": "#90EE90", "Verde Escuro": "#006400",
+    "Amarelo": "#FFFF00", "Amarelo Ouro": "#FFD700", "Laranja": "#FFA500",
+    "Rosa": "#FFC0CB", "Rosa Choque": "#FF1493", "Roxo": "#800080", "Roxo Claro": "#9370DB", "Violeta": "#EE82EE",
+    "Marrom": "#8B4513", "Marrom Claro": "#D2691E", "Bege": "#F5F5DC",
+    "Dourado": "#FFD700", "Prata Metálico": "#A6A6A6", "Bronze": "#CD7F32", "Cobre": "#B87333",
+    "Transparente": "#F0F0F0", "Fosco Branco": "#F5F5F5", "Fosco Preto": "#1A1A1A",
+    "Neon Rosa": "#FF6EC7", "Neon Verde": "#39FF14", "Neon Azul": "#00FFFF", "Neon Amarelo": "#FFFF33"
+};
+
+// Função auxiliar para gerar o HTML das cores
+function generateColorsHTML(colors) {
+    if (!colors || !Array.isArray(colors) || colors.length === 0) return '';
+
+    let html = '<div class="product-colors">';
+    
+    // Mostra até 5 cores
+    const displayColors = colors.slice(0, 5);
+    
+    displayColors.forEach(colorName => {
+        // Pega o código HEX ou usa cinza se não encontrar
+        const hex = COLOR_MAP[colorName] || '#cccccc'; 
+        html += `<span class="color-chip" style="background-color: ${hex}" title="${colorName}"></span>`;
+    });
+
+    // Se tiver mais de 5, mostra o contador (+2)
+    if (colors.length > 5) {
+        html += `<span class="more-colors">+${colors.length - 5}</span>`;
+    }
+
+    html += '</div>';
+    return html;
+}
+
 // Função para obter nome da categoria
 function getCategoryName(category) {
     const categories = {
@@ -251,6 +289,7 @@ function createProductCard(product) {
             </div>
         `;
     }
+    const colorsHTML = generateColorsHTML(product.colors);
     
     productCard.innerHTML = `
         <div class="product-image" data-product-id="${product.id}">
@@ -263,6 +302,9 @@ function createProductCard(product) {
             <h3><a href="Produto.html?id=${product.id}">${product.name}</a></h3>
             <p>${product.description}</p>
             ${specsHTML}
+
+            ${colorsHTML}
+
             <div class="product-price">R$ ${product.price.toFixed(2)}</div>
             <div class="product-actions">
                 <a href="Produto.html?id=${product.id}" class="btn btn-outline">
