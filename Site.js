@@ -281,10 +281,11 @@ function renderProducts(filter = 'all') {
             </div>
             <div class="product-info">
                 <h3><a href="Produto.html?id=${product.id}" style="text-decoration: none; color: inherit;">${product.name}</a></h3>
-                <p>${product.description}</p>
+                ${product.category ? `<p><small><strong>Categoria:</strong> ${product.category}</small></p>` : ''}
                 ${product.dimensions ? `<p><small><strong>Dimensões:</strong> ${product.dimensions}</small></p>` : ''}
                 ${product.material ? `<p><small><strong>Material:</strong> ${product.material}</small></p>` : ''}
-                
+                ${product.printTime ? `<p><small><strong>Tempo de Impressão:</strong> ${product.printTime}</small></p>` : ''}
+
                 ${colorsHTML}
 
                 <div class="product-price">R$ ${product.price.toFixed(2)}</div>
