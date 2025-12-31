@@ -1230,22 +1230,27 @@ textarea.form-control {
 /* Container das cores no card */
 .product-colors {
     display: flex;
-    gap: 5px;
-    margin-bottom: 8px; /* Espaço antes do preço */
+    gap: 6px; /* Espaço entre as bolinhas */
+    margin-bottom: 8px;
     flex-wrap: wrap;
     align-items: center;
     min-height: 24px;
+    
+    /* CORREÇÃO: Força as bolinhas a ficarem juntas na esquerda */
+    justify-content: flex-start !important; 
+    width: 100%;
 }
 
 /* A bolinha da cor */
 .color-chip {
-    width: 18px;
-    height: 18px;
+    width: 20px; /* Aumentei levemente para 20px para melhor visualização */
+    height: 20px;
     border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.2); /* Borda para cores claras como branco */
+    border: 1px solid rgba(0,0,0,0.15);
     display: inline-block;
     box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     position: relative;
+    cursor: help;
 }
 
 /* Tooltip simples ao passar o mouse (opcional, mostra o nome) */
@@ -1270,4 +1275,99 @@ textarea.form-control {
     font-size: 0.8rem;
     color: var(--gray);
     font-weight: 500;
+}
+
+/* --- PADRONIZAÇÃO DOS CARDS (Adicionar ao final de Site.css e TodosOsProdutos.css) --- */
+
+/* Força tamanho fixo e organiza o layout vertical */
+.product-card {
+    display: flex;
+    flex-direction: column;
+    height: 580px; /* Altura fixa para todos os cards */
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.product-info {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Ocupa todo o espaço restante */
+    gap: 8px;
+}
+
+/* Título do produto */
+.product-info h3 {
+    font-size: 1.1rem;
+    margin: 0;
+    height: 2.4em; /* Limita a 2 linhas de texto */
+    overflow: hidden;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* Etiqueta de Categoria (Badge) */
+.category-badge {
+    display: inline-block;
+    background-color: var(--light);
+    color: var(--gray);
+    font-size: 0.75rem;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+    align-self: flex-start;
+    margin-bottom: 5px;
+    border: 1px solid #eee;
+}
+
+/* Lista de Especificações (Material, Dimensões, Tempo) */
+.specs-list {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 5px 0;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spec-item i {
+    color: var(--primary);
+    width: 16px;
+    text-align: center;
+}
+
+/* Cores e Preço */
+.product-colors {
+    margin-top: auto; /* Empurra para o final da info */
+    padding-top: 5px;
+}
+
+.product-price {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--primary);
+    margin-top: 5px;
+}
+
+/* Ajuste dos botões para ficarem sempre alinhados no fundo */
+.product-actions, 
+.product-info > div:last-child {
+    margin-top: 10px;
 }
