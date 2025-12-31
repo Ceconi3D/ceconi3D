@@ -1,3 +1,19 @@
+// ========================================================================
+// === 1. MAPA DE CORES (NOVO)
+// ========================================================================
+const COLOR_MAP = {
+    "Branco": "#FFFFFF", "Preto": "#000000", "Cinza": "#808080", "Prata": "#C0C0C0",
+    "Vermelho": "#FF0000", "Vermelho Escuro": "#8B0000", "Vermelho Claro": "#FF6B6B",
+    "Azul": "#0000FF", "Azul Marinho": "#000080", "Azul Claro": "#ADD8E6", "Azul Turquesa": "#40E0D0",
+    "Verde": "#008000", "Verde Limão": "#32CD32", "Verde Claro": "#90EE90", "Verde Escuro": "#006400",
+    "Amarelo": "#FFFF00", "Amarelo Ouro": "#FFD700", "Laranja": "#FFA500",
+    "Rosa": "#FFC0CB", "Rosa Choque": "#FF1493", "Roxo": "#800080", "Roxo Claro": "#9370DB", "Violeta": "#EE82EE",
+    "Marrom": "#8B4513", "Marrom Claro": "#D2691E", "Bege": "#F5F5DC",
+    "Dourado": "#FFD700", "Prata Metálico": "#A6A6A6", "Bronze": "#CD7F32", "Cobre": "#B87333",
+    "Transparente": "#F0F0F0", "Fosco Branco": "#F5F5F5", "Fosco Preto": "#1A1A1A",
+    "Neon Rosa": "#FF6EC7", "Neon Verde": "#39FF14", "Neon Azul": "#00FFFF", "Neon Amarelo": "#FFFF33"
+};
+
 // Espera a página carregar
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔄 Iniciando carregamento - Página do Produto');
@@ -132,6 +148,13 @@ function renderProductDetails(product) {
         </div>
     `;
 
+    // --- CORES DISPONÍVEIS (NOVO) ---
+    // Procura o container de cores no HTML e insere as bolinhas
+    const colorsContainer = document.getElementById('product-colors-container');
+    if (colorsContainer) {
+        colorsContainer.innerHTML = generateColorsHTML(product.colors);
+    }
+
     // Especificações
     const specsContainer = document.getElementById('specs-grid');
     specsContainer.innerHTML = ''; // Limpar
@@ -202,9 +225,46 @@ function getCategoryName(category) {
     const categories = {
         'decoracao': 'Decoração',
         'utilitarios': 'Utilitários',
-        'prototipos': 'Protótipos'
+        'prototipos': 'Protótipos',
+        'joias': 'Jóias e Acessórios', 
+        'brinquedos': 'Brinquedos', 
+        'ferramentas': 'Ferramentas',
+        'automotivo': 'Automotivo', 
+        'medico': 'Médico e Odontológico', 
+        'arquitetura': 'Arquitetura e Maquetes',
+        'educacao': 'Educação', 
+        'moda': 'Moda', 
+        'esportes': 'Esportes', 
+        'personalizado': 'Personalizado'
     };
-    return categories[category] || 'Outros';
+    return categories[category] || category; // Modificado para retornar a própria categoria se não achar no mapa
+}
+
+// Nova função para gerar o HTML das cores
+function generateColorsHTML(colors) {
+    if (!colors || !Array.isArray(colors) || colors.length === 0) {
+        return '';
+    }
+
+    let html = '<div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 20px;">';
+    html += '<strong style="color: var(--dark); margin-right: 5px;">Cores:</strong> ';
+    
+    colors.forEach(colorName => {
+        const hex = COLOR_MAP[colorName] || '#cccccc';
+        html += `<span title="${colorName}" style="
+            width: 25px; 
+            height: 25px; 
+            border-radius: 50%; 
+            background-color: ${hex}; 
+            display: inline-block; 
+            border: 1px solid rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: help;
+        "></span>`;
+    });
+
+    html += '</div>';
+    return html;
 }
 
 function setupMobileMenu() {
