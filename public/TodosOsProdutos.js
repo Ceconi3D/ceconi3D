@@ -311,8 +311,8 @@ function createProductCard(product) {
                 <a href="Produto.html?id=${product.id}" class="btn btn-outline">
                     <i class="fas fa-eye"></i> Ver Detalhes
                 </a>
-                <a href="https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre o ${encodeURIComponent(product.name)}" 
-                   class="btn btn-whatsapp" target="_blank">
+                <a href="${CONFIG.whatsapp.getLink(CONFIG.whatsapp.messages.product(product.name))}"
+                   class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer">
                     <i class="fab fa-whatsapp"></i> Orçamento
                 </a>
             </div>
