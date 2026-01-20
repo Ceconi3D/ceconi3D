@@ -293,7 +293,7 @@ function renderProducts(filter = 'all') {
                     <a href="Produto.html?id=${product.id}" class="btn">
                         <i class="fas fa-eye"></i> Ver Detalhes
                     </a>
-                    <a href="${CONFIG.whatsapp.getLink(`Olá! Gostaria de saber mais sobre o ${encodeURIComponent(product.name)`)}" class="btn btn-whatsapp" target="_blank">
+                    <a href="https://wa.me/5519999600501?text=Olá! Gostaria de saber mais sobre o ${encodeURIComponent(product.name)}" class="btn btn-whatsapp" target="_blank">
                         <i class="fab fa-whatsapp"></i> Orçamento
                     </a>
                 </div>
