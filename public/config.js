@@ -1,0 +1,16 @@
+// ========================================================================
+// === CONFIGURAÇÕES GLOBAIS DO SITE
+// ========================================================================
+
+const CONFIG = {
+  // Configurações do WhatsApp
+  whatsapp: {
+    phone: '5519999600501',
+    messages: {
+      main: 'Olá! Gostaria de solicitar um orçamento para impressão 3D',
+      product: (productName) => `Olá! Gostaria de um orçamento para o produto: ${productName}`
+    },
+    // Gerar link completo do WhatsApp
+    getLink: (message) => `https://wa.me/${CONFIG.whatsapp.phone}?text=${encodeURIComponent(message)}`
+  }
+};
