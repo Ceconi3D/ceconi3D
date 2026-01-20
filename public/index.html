@@ -1,89 +1,177 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3DPrint - Impressão 3D Personalizada</title>
+    <link rel="stylesheet" type="text/css" href="Site.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo"><span></span><img src="IMAGENS/LOGO_PNG.png" alt="Ceconi 3D" class="logo-image"></a>
+                <ul class="nav-links">
+                    <li><a href="#home">Início</a></li>
+                    <li><a href="#about">Sobre</a></li>
+                    <li><a href="#products">Produtos</a></li>
+                    <li><a href="#services">Serviços</a></li>
+                    <li><a href="#contact">Contato</a></li>
+                </ul>
+                <div class="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Impressão 3D de Alta Qualidade</h1>
+            <p>Criamos peças personalizadas e únicas com a mais avançada tecnologia de impressão 3D. Transforme suas ideias em realidade!</p>
+            <a href="#contact" class="btn btn-whatsapp">
+                <i class="fab fa-whatsapp"></i> Solicite um Orçamento
+            </a>
+        </div>
+    </section>
+    <section class="about" id="about">
+        <div class="container">
+            <h2>Sobre Nós</h2>
+            <div class="about-content">
+                <div class="about-text">
+                    <p>Somos especialistas em impressão 3D, oferecendo soluções personalizadas para clientes que buscam peças únicas e de alta qualidade. Utilizamos as melhores tecnologias e materiais para garantir resultados excepcionais.</p>
+                    <p>Nossa missão é transformar suas ideias em objetos tangíveis, seja para prototipagem, peças funcionais ou projetos criativos.</p>
+                    <a href="#products" class="btn">Conheça Nossos Produtos</a>
+                </div>
+                <div class="about-image">
+                    <img src="IMAGENS/LOGO.jpeg" alt="Sobre a Ceconi 3D">
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="products" id="products">
+        <div class="container">
+            <h2>Nossos Produtos</h2>
+            <div class="product-filters">
+                <button class="filter-btn active" data-filter="all">Em destaque</button>
+            </div>
+            <div class="products-grid" id="products-container">
+                <div style="text-align: center; grid-column: 1 / -1; padding: 20px;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: white;"></i>
+                    <p style="color: white; margin-top: 10px;">Carregando produtos...</p>
+                </div>
+            </div>
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="TodosOsProdutos.html" class="btn">
+                    <i class="fas fa-th-list"></i> Ver Todos os Produtos
+                </a>
+            </div>
+        </div>
+    </section>
+    <section class="services" id="services">
+        <div class="container">
+            <h2>Nossos Serviços</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-pencil-ruler"></i>
+                    </div>
+                    <h3>Design Personalizado</h3>
+                    <p>Criamos designs exclusivos baseados em suas ideias e necessidades específicas.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-print"></i>
+                    </div>
+                    <h3>Impressão 3D</h3>
+                    <p>Execução de projetos com alta qualidade utilizando diferentes materiais e tecnologias.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Entre em Contato</h2>
+            <p>Tem um projeto em mente? Entre em contato conosco pelo WhatsApp e solicite um orçamento sem compromisso!</p>
+            <a href="https://wa.me/5519999600501?text=Olá! Gostaria de solicitar um orçamento para impressão 3D" class="btn btn-whatsapp" target="_blank">
+                <i class="fab fa-whatsapp"></i> Fale Conosco no WhatsApp
+            </a>
+        </div>
+    </section>
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3><img src="IMAGENS/LOGO_PNG.png" alt="Ceconi 3D" class="logo-image"></h3>
+                    <p>Especialistas em impressão 3D e soluções personalizadas para transformar suas ideias em realidade.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Links Rápidos</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#about">Sobre</a></li>
+                        <li><a href="#products">Produtos</a></li>
+                        <li><a href="#services">Serviços</a></li>
+                        <li><a href="#contact">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Contato</h3>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> Rua Exemplo, 123 - São Paulo, SP</li>
+                        <li><i class="fas fa-phone"></i> (11) 99999-9999</li>
+                        <li><i class="fas fa-envelope"></i> contato@ceconi3d.com.br</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Ceconi 3D - Todos os direitos reservados</p>
+                <div class="admin-secret">
+                    <a href="#" class="admin-micro-icon" id="admin-icon">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                    <span class="admin-secret-dot" id="secret-dot">·</span>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.8.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.8.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.8.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+    <!-- Firebase v8 (compatível) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
-    </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <script src="firebase-service.js"></script>
+    
+    <script src="Site.js"></script>
 
+    <!-- Debug helper -->
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+    // Aguardar o carregamento completo
+    setTimeout(() => {
+        console.log('🔄 Verificando FirebaseService...');
+        console.log('FirebaseService carregado:', typeof firebaseService !== 'undefined');
+        
+        if (typeof firebaseService !== 'undefined') {
+            console.log('✅ FirebaseService está disponível');
+            // Testar automaticamente
+            firebaseService.getProducts().then(products => {
+                console.log(`📦 ${products.length} produtos carregados automaticamente`);
+            });
+        } else {
+            console.error('❌ FirebaseService NÃO carregado');
         }
-      });
+    }, 2000);
     </script>
-  </body>
+</body>
 </html>
