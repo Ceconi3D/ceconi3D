@@ -96,6 +96,8 @@ async function loadProducts() {
         
         if (allProducts && allProducts.length > 0) {
             renderProducts();
+            setupEventListeners();  // Configurar filtros e busca
+            setupMobileMenu();       // Configurar menu mobile
         } else {
             console.warn('⚠️ Nenhum produto encontrado');
             showNoProductsMessage();
