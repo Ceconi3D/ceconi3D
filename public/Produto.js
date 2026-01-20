@@ -166,7 +166,7 @@ function renderProductDetails(product) {
     if (product.specifications) specsContainer.innerHTML += createSpecItem('Detalhes', product.specifications, true);
 
     // Botão WhatsApp
-    const whatsappLink = `https://wa.me/551199999999?text=Olá! Gostaria de um orçamento para o produto: ${encodeURIComponent(product.name)}`;
+    const whatsappLink = CONFIG.whatsapp.getLink(CONFIG.whatsapp.messages.product(product.name));
     document.getElementById('whatsapp-button').href = whatsappLink;
 }
 

@@ -1,5 +1,19 @@
-// Array global de produtos
-let products = [];
+// ========================================================================
+// === INICIALIZAÇÃO - Configurar links do WhatsApp
+// ========================================================================
+
+// Inicializar links de WhatsApp quando o DOM está pronto
+document.addEventListener('DOMContentLoaded', function() {
+    // Link de contato principal
+    const contactLink = document.getElementById('whatsapp-contact-link');
+    if (contactLink) {
+        contactLink.href = CONFIG.whatsapp.getLink(CONFIG.whatsapp.messages.main);
+    }
+});
+
+// ========================================================================
+// === ARRAY GLOBAL DE PRODUTOS E CONFIGURAÇÕES
+// ========================================================================
 
 // Mapa de cores para converter nomes em Hex (Copie isso para Site.js e TodosOsProdutos.js)
 const COLOR_MAP = {
@@ -293,7 +307,7 @@ function renderProducts(filter = 'all') {
                     <a href="Produto.html?id=${product.id}" class="btn">
                         <i class="fas fa-eye"></i> Ver Detalhes
                     </a>
-                    <a href="https://wa.me/5511999999999?text=Olá! Gostaria de saber mais sobre o ${encodeURIComponent(product.name)}" class="btn btn-whatsapp" target="_blank">
+                    <a href="https://wa.me/${CONFIG.whatsapp.phone}?text=${encodeURIComponent(CONFIG.whatsapp.messages.product(product.name))}" class="btn btn-whatsapp" target="_blank" rel="noopener noreferrer">
                         <i class="fab fa-whatsapp"></i> Orçamento
                     </a>
                 </div>
