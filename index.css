@@ -1230,7 +1230,7 @@ textarea.form-control {
 /* Container das cores no card */
 .product-colors {
     display: flex;
-    gap: 6px; /* Espaço entre as bolinhas */
+    gap: 5px; /* Espaço entre as bolinhas */
     margin-bottom: 8px;
     flex-wrap: wrap;
     align-items: center;
@@ -1370,4 +1370,34 @@ textarea.form-control {
 .product-actions, 
 .product-info > div:last-child {
     margin-top: 10px;
+}
+/* CORREÇÃO PARA AS BOLINHAS DE COR NO MOBILE - INDEX.HTML */
+@media (max-width: 768px) {
+    .product-colors {
+        flex-direction: row !important; /* Garante que fique na horizontal */
+        flex-wrap: wrap !important; /* Permite quebrar linha se necessário */
+        justify-content: flex-start !important;
+    }
+    
+    .color-chip {
+        margin-bottom: 5px; /* Espaço entre linhas se quebrar */
+    }
+    
+    /* Garante que o container de cores ocupe toda a largura */
+    .product-info .product-colors {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+/* Para telas muito pequenas, ajuste adicional */
+@media (max-width: 480px) {
+    .product-colors {
+        gap: 4px !important;
+    }
+    
+    .color-chip {
+        width: 16px !important;
+        height: 16px !important;
+    }
 }
