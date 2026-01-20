@@ -6,7 +6,7 @@ let currentSearchTerm = '';
 let currentCategoryFilter = 'all';
 let currentSortBy = 'name-asc';
 
-// Mapa de cores para converter nomes em Hex (Copie isso para Site.js e TodosOsProdutos.js)
+// Mapa de cores para converter nomes em Hex (Copie isso para index.js e TodosOsProdutos.js)
 const COLOR_MAP = {
     "Branco": "#FFFFFF", "Preto": "#000000", "Cinza": "#808080", "Prata": "#C0C0C0",
     "Vermelho": "#FF0000", "Vermelho Escuro": "#8B0000", "Vermelho Claro": "#FF6B6B",

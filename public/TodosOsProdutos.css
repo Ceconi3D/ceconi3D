@@ -239,16 +239,16 @@ header {
     font-size: 0.9rem;
 }
 
-/* Grid de Produtos - CARDS COM TAMANHO FIXO IGUAL AO SITE.CSS */
+/* Grid de Produtos - CARDS COM TAMANHO FIXO IGUAL AO INDEX.CSS */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, 300px); /* Largura fixa igual ao Site.css */
+    grid-template-columns: repeat(auto-fit, 300px); /* Largura fixa igual ao index.css */
     gap: 30px;
     justify-content: center;
     margin-bottom: 50px;
 }
 
-/* CARD COM TAMANHO FIXO IGUAL AO SITE.CSS */
+/* CARD COM TAMANHO FIXO IGUAL AO INDEX.CSS */
 .product-card {
     background: white;
     border-radius: 10px;
@@ -256,7 +256,7 @@ header {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
     transition: var(--transition);
     width: 300px; /* Largura fixa */
-    height: 500px; /* Altura total fixa igual ao Site.css */
+    height: 500px; /* Altura total fixa igual ao index.css */
     display: flex;
     flex-direction: column;
 }
@@ -266,7 +266,7 @@ header {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* IMAGEM FIXA IGUAL AO SITE.CSS */
+/* IMAGEM FIXA IGUAL AO INDEX.CSS */
 .product-image {
     height: 200px;
     overflow: hidden;
@@ -374,7 +374,7 @@ header {
     transform: scale(1.1);
 }
 
-/* ÁREA DE INFORMAÇÕES FLEXÍVEL IGUAL AO SITE.CSS */
+/* ÁREA DE INFORMAÇÕES FLEXÍVEL IGUAL AO INDEX.CSS */
 .product-info {
     padding: 20px;
     flex: 1; /* Ocupa o espaço restante */
@@ -400,7 +400,7 @@ header {
     color: var(--primary);
 }
 
-/* DESCRIÇÃO COM ALTURA CONTROLADA IGUAL AO SITE.CSS */
+/* DESCRIÇÃO COM ALTURA CONTROLADA IGUAL AO INDEX.CSS */
 .product-info > p {
     color: var(--gray);
     font-size: 0.9rem;
