@@ -16,6 +16,43 @@
 .logo-image:hover {
     transform: scale(1.05);
 }
+/* CORREÇÃO PARA OVERFLOW HORIZONTAL NO MOBILE */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Garantir que o container principal não ultrapasse a largura */
+.container {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Corrigir qualquer imagem que possa estar causando overflow */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Corrigir especificamente os cards de produto */
+.product-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Corrigir a grid de produtos */
+.products-grid {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Corrigir o menu mobile */
+.nav-links {
+    width: 100%;
+    box-sizing: border-box;
+}
 /* Reset e estilos base */
 * {
     margin: 0;
