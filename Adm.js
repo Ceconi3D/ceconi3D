@@ -746,34 +746,22 @@ function setupRealTimeValidation() {
     const weightInput = document.getElementById('product-weight');
     if (weightInput) {
         weightInput.addEventListener('input', function(e) {
-            let value = e.target.value;
+            let value = e.target.value.trim();
             
-            // Remove caracteres não numéricos, exceto ponto decimal
-            value = value.replace(/[^\d.]/g, '');
-            
-            // Garante que há apenas um ponto decimal
-            const parts = value.split('.');
-            if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
-            }
-            
-            // Limita a 1 casa decimal
-            if (parts.length === 2 && parts[1].length > 1) {
-                value = parts[0] + '.' + parts[1].substring(0, 1);
-            }
-            
-            e.target.value = value;
-            
-            const numericValue = parseFloat(value);
             let error = '';
             
             if (value.length > 0) {
-                if (isNaN(numericValue)) {
-                    error = 'Digite um número válido';
-                } else if (numericValue <= 0) {
-                    error = 'O peso deve ser maior que zero';
-                } else if (numericValue > 10000) {
-                    error = 'Peso máximo: 10.000g';
+                // Permite números e letras (para KG, G, etc)
+                if (!/^[\d\s.,a-zA-Záàâãäåèéêëìíîïòóôõöùúûüýÿçñ]+$/.test(value)) {
+                    error = 'Use apenas números, letras e pontos/vírgulas';
+                } else {
+                    // Verificar se tem AMBOS números e letras
+                    const hasNumbers = /\d/.test(value);
+                    const hasLetters = /[a-zA-Záàâãäåèéêëìíîïòóôõöùúûüýÿçñ]/i.test(value);
+                    
+                    if (!hasNumbers || !hasLetters) {
+                        error = 'Use combinação de número e letra (ex: 500g, 1.5kg)';
+                    }
                 }
             } else {
                 error = 'O peso é obrigatório';
@@ -1369,8 +1357,7 @@ async function handleFormSubmit(e) {
         material: document.getElementById('product-material').value.trim(),
         // NOVO: Coletar cores selecionadas
         colors: selectedColors.map(c => c.name), // Apenas os nomes
-        weight: document.getElementById('product-weight').value ? 
-                parseFloat(document.getElementById('product-weight').value) : null,
+        weight: document.getElementById('product-weight').value.trim() || null,
         printTime: document.getElementById('product-print-time').value.trim(),
         specifications: document.getElementById('product-specifications').value.trim(),
         images: []
