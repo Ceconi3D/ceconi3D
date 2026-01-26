@@ -206,23 +206,35 @@ class FirebaseService {
 
     async saveProduct(productData) {
         try {
+            console.log('📝 [saveProduct] Iniciando salvar produto...');
+            console.log('📝 [saveProduct] Dados recebidos:', productData);
+            console.log('📝 [saveProduct] Usuário autenticado?', this.auth.currentUser);
+            
             const product = {
                 ...productData,
                 createdAt: productData.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
+            console.log('📝 [saveProduct] Objeto produto preparado:', product);
+
             if (productData.id) {
+                console.log('📝 [saveProduct] Atualizando produto existente:', productData.id);
                 // Atualizar produto existente
                 await this.db.collection('products').doc(productData.id).update(product);
+                console.log('✅ [saveProduct] Produto atualizado com sucesso');
                 return { success: true, id: productData.id };
             } else {
+                console.log('📝 [saveProduct] Adicionando novo produto...');
                 // Adicionar novo produto
                 const docRef = await this.db.collection('products').add(product);
+                console.log('✅ [saveProduct] Novo produto criado com ID:', docRef.id);
                 return { success: true, id: docRef.id };
             }
         } catch (error) {
-            console.error('Erro ao salvar produto:', error);
+            console.error('❌ [saveProduct] Erro ao salvar produto:', error);
+            console.error('❌ [saveProduct] Código de erro:', error.code);
+            console.error('❌ [saveProduct] Mensagem:', error.message);
             return { success: false, error: error.message };
         }
     }
