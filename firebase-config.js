@@ -28,3 +28,4 @@ export const analytics = getAnalytics(app);
 
 // Tornar disponível globalmente (para compatibilidade)
 window.firebaseApp = app;
+console.log('✅ Firebase configurado corretamente');
