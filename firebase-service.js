@@ -1,7 +1,7 @@
 // firebase-service.js - VERSÃO CORRIGIDA COM SEGURANÇA
 class FirebaseService {
     constructor() {
-        // Inicializar Firebase diretamente aqui
+        // Tentar carregar do firebase-config.js primeiro
         this.initializeFirebase();
         this.failedAttempts = 0;
         this.MAX_ATTEMPTS = 5;
@@ -9,6 +9,24 @@ class FirebaseService {
     }
 
     initializeFirebase() {
+        try {
+            // Primeiro, tentar usar as instâncias do firebase-config.js se disponíveis
+            if (window.firebaseApp) {
+                console.log('✅ Usando Firebase já inicializado pelo firebase-config.js');
+                // Usar a biblioteca global firebase para acessar firestore e auth
+                this.app = firebase.app();
+                this.db = firebase.firestore();
+                this.storage = firebase.storage();
+                this.auth = firebase.auth();
+                return;
+            }
+        } catch (error) {
+            console.log('❌ Não foi possível usar firebase-config, inicializando fallback...');
+        }
+
+        // Fallback: inicializar diretamente
+        console.log('🔄 Inicializando Firebase diretamente...');
+        
         // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDtkenwPEZaPFs6BWUZbzkljorWSZGoTgc",
@@ -20,13 +38,26 @@ class FirebaseService {
             measurementId: "G-QTHFTLC63T"
         };
 
-        // Inicializar Firebase
-        this.app = firebase.initializeApp(firebaseConfig);
-        this.db = firebase.firestore();
-        this.storage = firebase.storage();
-        this.auth = firebase.auth();
-        
-        console.log('✅ Firebase inicializado no Service');
+        // Verificar se Firebase já foi inicializado
+        try {
+            if (typeof firebase !== 'undefined') {
+                if (!firebase.apps.length) {
+                    this.app = firebase.initializeApp(firebaseConfig);
+                    console.log('✅ Firebase inicializado diretamente (primeira vez)');
+                } else {
+                    this.app = firebase.app();
+                    console.log('✅ Firebase já estava inicializado, usando instância existente');
+                }
+                
+                this.db = firebase.firestore();
+                this.storage = firebase.storage();
+                this.auth = firebase.auth();
+            } else {
+                console.error('❌ Firebase não está disponível globalmente');
+            }
+        } catch (error) {
+            console.error('❌ Erro ao inicializar Firebase:', error);
+        }
     }
 
     // ========== VALIDAÇÃO DE SEGURANÇA ==========
@@ -174,6 +205,13 @@ class FirebaseService {
     async getProducts() {
         try {
             console.log('🔍 Buscando produtos do Firestore...');
+            
+            // Verificar se o Firestore está disponível
+            if (!this.db) {
+                console.error('❌ Firestore não inicializado');
+                return [];
+            }
+            
             const snapshot = await this.db.collection('products')
                 .orderBy('createdAt', 'desc')
                 .get();
@@ -187,6 +225,7 @@ class FirebaseService {
             return products;
         } catch (error) {
             console.error('❌ Erro ao buscar produtos:', error);
+            console.error('❌ Detalhes do erro:', error.message);
             return [];
         }
     }
@@ -208,13 +247,38 @@ class FirebaseService {
         try {
             console.log('📝 [saveProduct] Iniciando salvar produto...');
             console.log('📝 [saveProduct] Dados recebidos:', productData);
-            console.log('📝 [saveProduct] Usuário autenticado?', this.auth.currentUser);
             
+            // Verificar se está autenticado
+            if (!this.auth.currentUser) {
+                console.error('❌ [saveProduct] Usuário não autenticado!');
+                return { success: false, error: 'Usuário não autenticado. Faça login novamente.' };
+            }
+            
+            console.log('📝 [saveProduct] Usuário autenticado:', this.auth.currentUser.email);
+            console.log('📝 [saveProduct] Firestore disponível?', !!this.db);
+            
+            // Preparar objeto do produto
             const product = {
-                ...productData,
-                createdAt: productData.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                name: productData.name,
+                description: productData.description,
+                price: productData.price,
+                category: productData.category,
+                dimensions: productData.dimensions || '',
+                material: productData.material || '',
+                colors: productData.colors || [],
+                weight: productData.weight || '',
+                printTime: productData.printTime || '',
+                specifications: productData.specifications || '',
+                images: productData.images || [],
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: this.auth.currentUser.email
             };
+
+            // Adicionar createdBy e createdAt apenas para novos produtos
+            if (!productData.id) {
+                product.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                product.createdBy = this.auth.currentUser.email;
+            }
 
             console.log('📝 [saveProduct] Objeto produto preparado:', product);
 
@@ -235,7 +299,16 @@ class FirebaseService {
             console.error('❌ [saveProduct] Erro ao salvar produto:', error);
             console.error('❌ [saveProduct] Código de erro:', error.code);
             console.error('❌ [saveProduct] Mensagem:', error.message);
-            return { success: false, error: error.message };
+            console.error('❌ [saveProduct] Stack:', error.stack);
+            
+            let errorMessage = error.message;
+            if (error.code === 'permission-denied') {
+                errorMessage = 'Permissão negada. Verifique as regras do Firestore.';
+            } else if (error.code === 'not-found') {
+                errorMessage = 'Firestore não encontrado. Verifique a inicialização.';
+            }
+            
+            return { success: false, error: errorMessage };
         }
     }
 
