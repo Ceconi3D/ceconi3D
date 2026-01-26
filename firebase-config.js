@@ -8,13 +8,13 @@ import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase
 
 // Sua configuração do Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyAV8cgruzRw_WHAtVBjBm2FYRqSp4Ps60A",
-    authDomain: "teste-site-b58d5.firebaseapp.com",
-    projectId: "teste-site-b58d5",
-    storageBucket: "teste-site-b58d5.firebasestorage.app",
-    messagingSenderId: "90201089059",
-    appId: "1:90201089059:web:78eddc1ed353099f71bd96",
-    measurementId: "G-4Q7QBDJDCS"
+  apiKey: "AIzaSyDtkenwPEZaPFs6BWUZbzkljorWSZGoTgc",
+  authDomain: "sitececoni3d.firebaseapp.com",
+  projectId: "sitececoni3d",
+  storageBucket: "sitececoni3d.firebasestorage.app",
+  messagingSenderId: "221241165805",
+  appId: "1:221241165805:web:a93d990d14d67476c289e4",
+  measurementId: "G-QTHFTLC63T"
 };
 
 // Inicializar Firebase
