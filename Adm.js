@@ -885,12 +885,15 @@ function formatDimensionsWhileTyping(input) {
 
 // Função para mostrar preview das dimensões
 function showDimensionsPreview(formattedDimensions) {
+    const dimensionsInputElement = document.getElementById('product-dimensions');
+    if (!dimensionsInputElement) return;
+    
     let previewElement = document.getElementById('dimensions-preview');
     if (!previewElement) {
         previewElement = document.createElement('div');
         previewElement.id = 'dimensions-preview';
         previewElement.className = 'dimensions-preview';
-        dimensionsInput.parentNode.appendChild(previewElement);
+        dimensionsInputElement.parentNode.appendChild(previewElement);
     }
     
     // Parse das dimensões para mostrar bonito
@@ -937,6 +940,9 @@ function hideDimensionsPreview() {
 
 // Função para mostrar dicas de formato
 function showDimensionsTips() {
+    const dimensionsInputElement = document.getElementById('product-dimensions');
+    if (!dimensionsInputElement) return;
+    
     // Criar tooltip de dicas se não existir
     if (!document.getElementById('dimensions-tips')) {
         const tips = document.createElement('div');
@@ -964,7 +970,7 @@ function showDimensionsTips() {
             <p><small>O sistema formatará automaticamente para: <strong>10 × 15 × 5 cm</strong></small></p>
         `;
         
-        const dimensionsGroup = dimensionsInput.closest('.form-group');
+        const dimensionsGroup = dimensionsInputElement.closest('.form-group');
         dimensionsGroup.appendChild(tips);
         
         // Remover tooltip após 15 segundos ou ao clicar fora
@@ -1022,12 +1028,15 @@ function updateFieldValidation(fieldId, value, errorMessage = '') {
 
 // Função para mostrar preview do preço formatado
 function showPricePreview(value) {
+    const priceInputElement = document.getElementById('product-price');
+    if (!priceInputElement) return;
+    
     let previewElement = document.getElementById('price-preview');
     if (!previewElement) {
         previewElement = document.createElement('div');
         previewElement.id = 'price-preview';
         previewElement.className = 'price-preview';
-        priceInput.parentNode.appendChild(previewElement);
+        priceInputElement.parentNode.appendChild(previewElement);
     }
     
     if (!isNaN(value) && value > 0) {
