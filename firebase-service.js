@@ -1,32 +1,14 @@
-// firebase-service.js - VERSÃO CORRIGIDA COM SEGURANÇA
+// firebase-service.js - VERSÃO MODERNA (SDK 9.22.2)
 class FirebaseService {
-    constructor() {
-        // Inicializar Firebase diretamente aqui
-        this.initializeFirebase();
+    constructor(auth, db, storage) {
+        this.auth = auth;
+        this.db = db;
+        this.storage = storage;
         this.failedAttempts = 0;
         this.MAX_ATTEMPTS = 5;
         this.LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutos
-    }
-
-    initializeFirebase() {
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDtkenwPEZaPFs6BWUZbzkljorWSZGoTgc",
-            authDomain: "sitececoni3d.firebaseapp.com",
-            projectId: "sitececoni3d",
-            storageBucket: "sitececoni3d.firebasestorage.app",
-            messagingSenderId: "221241165805",
-            appId: "1:221241165805:web:a93d990d14d67476c289e4",
-            measurementId: "G-QTHFTLC63T"
-        };
-
-        // Inicializar Firebase
-        this.app = firebase.initializeApp(firebaseConfig);
-        this.db = firebase.firestore();
-        this.storage = firebase.storage();
-        this.auth = firebase.auth();
         
-        console.log('✅ Firebase inicializado no Service');
+        console.log('✅ FirebaseService inicializado com SDK moderno');
     }
 
     // ========== VALIDAÇÃO DE SEGURANÇA ==========
@@ -86,6 +68,8 @@ class FirebaseService {
     // ========== AUTENTICAÇÃO SEGURA ==========
     async loginAdmin(email, password) {
         try {
+            const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js');
+            
             // Verificar se a conta está bloqueada
             const lockError = this.isAccountLocked();
             if (lockError) {
@@ -101,16 +85,17 @@ class FirebaseService {
                 };
             }
 
-            const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
+            const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
             
             // Login bem-sucedido - resetar tentativas
             this.failedAttempts = 0;
             localStorage.removeItem('admin_lockout_time');
             localStorage.setItem('admin_last_login', Date.now().toString());
             
+            console.log('✅ Login bem-sucedido:', userCredential.user.email);
             return { success: true, user: userCredential.user };
         } catch (error) {
-            console.error('Erro no login:', error);
+            console.error('❌ Erro no login:', error);
             
             // Incrementar tentativas falhas
             this.failedAttempts++;
@@ -146,14 +131,22 @@ class FirebaseService {
     }
 
     async logout() {
-        await this.auth.signOut();
-        localStorage.removeItem('admin_last_login');
+        try {
+            const { signOut } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js');
+            await signOut(this.auth);
+            localStorage.removeItem('admin_last_login');
+            console.log('✅ Logout realizado com sucesso');
+        } catch (error) {
+            console.error('❌ Erro ao fazer logout:', error);
+        }
     }
 
     checkAuth() {
         return new Promise((resolve) => {
-            this.auth.onAuthStateChanged((user) => {
-                resolve(!!user);
+            import('https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js').then(module => {
+                module.onAuthStateChanged(this.auth, (user) => {
+                    resolve(!!user);
+                });
             });
         });
     }
@@ -173,10 +166,11 @@ class FirebaseService {
     // ========== PRODUTOS ==========
     async getProducts() {
         try {
+            const { collection, orderBy, query, getDocs } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+            
             console.log('🔍 Buscando produtos do Firestore...');
-            const snapshot = await this.db.collection('products')
-                .orderBy('createdAt', 'desc')
-                .get();
+            const q = query(collection(this.db, 'products'), orderBy('createdAt', 'desc'));
+            const snapshot = await getDocs(q);
             
             const products = snapshot.docs.map(doc => ({
                 id: doc.id,
@@ -193,58 +187,58 @@ class FirebaseService {
 
     async getProductById(id) {
         try {
-            const doc = await this.db.collection('products').doc(id).get();
-            if (doc.exists) {
-                return { id: doc.id, ...doc.data() };
+            const { collection, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+            
+            const docRef = doc(this.db, 'products', id);
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                return { id: docSnap.id, ...docSnap.data() };
             }
             return null;
         } catch (error) {
-            console.error('Erro ao buscar produto:', error);
+            console.error('❌ Erro ao buscar produto:', error);
             return null;
         }
     }
 
     async saveProduct(productData) {
         try {
-            console.log('📝 [saveProduct] Iniciando salvar produto...');
-            console.log('📝 [saveProduct] Dados recebidos:', productData);
-            console.log('📝 [saveProduct] Usuário autenticado?', this.auth.currentUser);
+            const { collection, doc, setDoc, addDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
             
             const product = {
                 ...productData,
-                createdAt: productData.createdAt || firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                createdAt: productData.createdAt || serverTimestamp(),
+                updatedAt: serverTimestamp()
             };
 
-            console.log('📝 [saveProduct] Objeto produto preparado:', product);
-
             if (productData.id) {
-                console.log('📝 [saveProduct] Atualizando produto existente:', productData.id);
                 // Atualizar produto existente
-                await this.db.collection('products').doc(productData.id).update(product);
-                console.log('✅ [saveProduct] Produto atualizado com sucesso');
+                const docRef = doc(this.db, 'products', productData.id);
+                await setDoc(docRef, product, { merge: true });
+                console.log('✅ Produto atualizado:', productData.id);
                 return { success: true, id: productData.id };
             } else {
-                console.log('📝 [saveProduct] Adicionando novo produto...');
                 // Adicionar novo produto
-                const docRef = await this.db.collection('products').add(product);
-                console.log('✅ [saveProduct] Novo produto criado com ID:', docRef.id);
+                const docRef = await addDoc(collection(this.db, 'products'), product);
+                console.log('✅ Novo produto criado:', docRef.id);
                 return { success: true, id: docRef.id };
             }
         } catch (error) {
-            console.error('❌ [saveProduct] Erro ao salvar produto:', error);
-            console.error('❌ [saveProduct] Código de erro:', error.code);
-            console.error('❌ [saveProduct] Mensagem:', error.message);
+            console.error('❌ Erro ao salvar produto:', error);
             return { success: false, error: error.message };
         }
     }
 
     async deleteProduct(productId) {
         try {
-            await this.db.collection('products').doc(productId).delete();
+            const { collection, doc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js');
+            
+            await deleteDoc(doc(this.db, 'products', productId));
+            console.log('✅ Produto excluído:', productId);
             return { success: true };
         } catch (error) {
-            console.error('Erro ao excluir produto:', error);
+            console.error('❌ Erro ao excluir produto:', error);
             return { success: false, error: error.message };
         }
     }
@@ -252,24 +246,33 @@ class FirebaseService {
     // ========== UPLOAD DE IMAGENS ==========
     async uploadImage(file, productId) {
         try {
+            const { ref, uploadBytes, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js');
+            
             const fileName = `products/${productId}/${Date.now()}_${file.name}`;
-            const storageRef = this.storage.ref().child(fileName);
-            const snapshot = await storageRef.put(file);
-            const downloadURL = await snapshot.ref.getDownloadURL();
+            const storageRef = ref(this.storage, fileName);
+            
+            await uploadBytes(storageRef, file);
+            const downloadURL = await getDownloadURL(storageRef);
+            
+            console.log('✅ Imagem salva:', downloadURL);
             return { success: true, url: downloadURL };
         } catch (error) {
-            console.error('Erro ao fazer upload da imagem:', error);
+            console.error('❌ Erro ao fazer upload da imagem:', error);
             return { success: false, error: error.message };
         }
     }
 
     async deleteImage(imageUrl) {
         try {
-            const imageRef = this.storage.refFromURL(imageUrl);
-            await imageRef.delete();
+            const { ref, deleteObject } = await import('https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js');
+            
+            const imageRef = ref(this.storage, imageUrl);
+            await deleteObject(imageRef);
+            
+            console.log('✅ Imagem excluída');
             return { success: true };
         } catch (error) {
-            console.error('Erro ao excluir imagem:', error);
+            console.error('❌ Erro ao excluir imagem:', error);
             return { success: false, error: error.message };
         }
     }
@@ -284,7 +287,7 @@ class FirebaseService {
                 totalCategories: categories.length,
             };
         } catch (error) {
-            console.error('Erro ao buscar estatísticas:', error);
+            console.error('❌ Erro ao buscar estatísticas:', error);
             return null;
         }
     }
@@ -295,6 +298,5 @@ class FirebaseService {
     }
 }
 
-// Instância global do serviço
-const firebaseService = new FirebaseService();
-window.firebaseService = firebaseService;
+// Exportar a classe para uso como módulo
+export { FirebaseService };
