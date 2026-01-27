@@ -14,10 +14,12 @@ class FirebaseService {
             if (window.firebaseApp) {
                 console.log('✅ Usando Firebase já inicializado pelo firebase-config.js');
                 // Usar a biblioteca global firebase para acessar firestore e auth
-                this.app = firebase.app();
-                this.db = firebase.firestore();
-                this.storage = firebase.storage();
-                this.auth = firebase.auth();
+                // Garante o uso do window.firebase se a variável local não estiver definida
+                const fb = window.firebase || firebase;
+                this.app = fb.app();
+                this.db = fb.firestore();
+                this.storage = fb.storage();
+                this.auth = fb.auth();
                 return;
             }
         } catch (error) {

@@ -1,10 +1,10 @@
 // firebase-config.js - CORRIGIDO
 // Importar as funções necessárias do Firebase
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+import firebase from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js";
+import "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js";
+import "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js";
+import "https://www.gstatic.com/firebasejs/9.22.2/firebase-storage-compat.js";
+import "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js";
 
 // Sua configuração do Firebase
 const firebaseConfig = {
@@ -18,14 +18,15 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-const app = initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 
 // Exportar as instâncias para uso em outros arquivos
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-export const analytics = getAnalytics(app);
+export const auth = firebase.auth();
+export const db = firebase.firestore();
+export const storage = firebase.storage();
+export const analytics = firebase.analytics();
 
 // Tornar disponível globalmente (para compatibilidade)
+window.firebase = firebase; // Essencial para o firebase-service.js funcionar
 window.firebaseApp = app;
 console.log('✅ Firebase configurado corretamente');
