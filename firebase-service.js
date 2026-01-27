@@ -1,31 +1,14 @@
-// firebase-service.js - VERSÃO CORRIGIDA COM SEGURANÇA
+// firebase-service.js - VERSÃO V8 CORRIGIDA
 class FirebaseService {
     constructor() {
-        // Tentar carregar do firebase-config.js primeiro
-        this.initializeFirebase();
-        this.failedAttempts = 0;
-        this.MAX_ATTEMPTS = 5;
-        this.LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutos
-    }
-
-    initializeFirebase() {
-        try {
-            // Primeiro, tentar usar as instâncias do firebase-config.js se disponíveis
-            if (window.firebaseApp) {
-                console.log('✅ Usando Firebase já inicializado pelo firebase-config.js');
-                // Usar a biblioteca global firebase para acessar firestore e auth
-                this.app = firebase.app();
-                this.db = firebase.firestore();
-                this.storage = firebase.storage();
-                this.auth = firebase.auth();
-                return;
-            }
-        } catch (error) {
-            console.log('❌ Não foi possível usar firebase-config, inicializando fallback...');
+        console.log('🔄 Inicializando FirebaseService v8...');
+        
+        // Verificar se Firebase foi carregado
+        if (typeof firebase === 'undefined') {
+            console.error('❌ Firebase não foi carregado! Verifique os scripts no HTML.');
+            alert('Erro: Firebase não carregado. Recarregue a página.');
+            return;
         }
-
-        // Fallback: inicializar diretamente
-        console.log('🔄 Inicializando Firebase diretamente...');
         
         // Configuração do Firebase
         const firebaseConfig = {
@@ -37,27 +20,31 @@ class FirebaseService {
             appId: "1:221241165805:web:a93d990d14d67476c289e4",
             measurementId: "G-QTHFTLC63T"
         };
-
-        // Verificar se Firebase já foi inicializado
-        try {
-            if (typeof firebase !== 'undefined') {
-                if (!firebase.apps.length) {
-                    this.app = firebase.initializeApp(firebaseConfig);
-                    console.log('✅ Firebase inicializado diretamente (primeira vez)');
-                } else {
-                    this.app = firebase.app();
-                    console.log('✅ Firebase já estava inicializado, usando instância existente');
-                }
-                
-                this.db = firebase.firestore();
-                this.storage = firebase.storage();
-                this.auth = firebase.auth();
-            } else {
-                console.error('❌ Firebase não está disponível globalmente');
-            }
-        } catch (error) {
-            console.error('❌ Erro ao inicializar Firebase:', error);
+        
+        // Inicializar Firebase apenas uma vez
+        if (!firebase.apps.length) {
+            console.log('✅ Inicializando Firebase pela primeira vez...');
+            this.app = firebase.initializeApp(firebaseConfig);
+        } else {
+            console.log('✅ Usando Firebase já inicializado');
+            this.app = firebase.app();
         }
+        
+        // Inicializar serviços
+        this.db = firebase.firestore();
+        this.storage = firebase.storage();
+        this.auth = firebase.auth();
+        
+        console.log('✅ Firebase v8 inicializado com sucesso');
+        console.log('📊 Projeto:', firebaseConfig.projectId);
+        console.log('🗄️  Firestore:', !!this.db);
+        console.log('📦 Storage:', !!this.storage);
+        console.log('🔐 Auth:', !!this.auth);
+        
+        // Configurações de segurança
+        this.failedAttempts = 0;
+        this.MAX_ATTEMPTS = 5;
+        this.LOCKOUT_TIME = 15 * 60 * 1000; // 15 minutos
     }
 
     // ========== VALIDAÇÃO DE SEGURANÇA ==========
@@ -226,6 +213,7 @@ class FirebaseService {
         } catch (error) {
             console.error('❌ Erro ao buscar produtos:', error);
             console.error('❌ Detalhes do erro:', error.message);
+            console.error('❌ Código do erro:', error.code);
             return [];
         }
     }
@@ -261,7 +249,7 @@ class FirebaseService {
             const product = {
                 name: productData.name,
                 description: productData.description,
-                price: productData.price,
+                price: parseFloat(productData.price),
                 category: productData.category,
                 dimensions: productData.dimensions || '',
                 material: productData.material || '',
@@ -366,8 +354,64 @@ class FirebaseService {
         const dataString = JSON.stringify(products);
         return new Blob([dataString]).size;
     }
+
+    // ========== TESTE DE CONEXÃO ==========
+    async testFirestoreConnection() {
+        console.log('🧪 Testando conexão Firestore...');
+        try {
+            // Tentar uma operação simples de leitura
+            const testRef = this.db.collection('products').limit(1);
+            const snapshot = await testRef.get();
+            
+            console.log(`✅ Firestore conectado! ${snapshot.docs.length} produto(s) encontrado(s).`);
+            
+            // Se não houver produtos, testar uma operação de escrita
+            if (snapshot.empty) {
+                console.log('⚠️  Nenhum produto encontrado, testando escrita...');
+                const testDoc = {
+                    test: true,
+                    message: 'Teste de conexão Firestore',
+                    timestamp: new Date().toISOString()
+                };
+                
+                const writeRef = await this.db.collection('connection_test').add(testDoc);
+                console.log('✅ Escrita OK! Documento criado com ID:', writeRef.id);
+                
+                // Limpar o documento de teste
+                await writeRef.delete();
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Falha na conexão Firestore:', error);
+            console.error('❌ Código:', error.code);
+            console.error('❌ Mensagem:', error.message);
+            
+            if (error.code === 'not-found') {
+                console.error('🔥 PROBLEMA CRÍTICO: Firestore não existe no projeto!');
+                console.error('🔥 Acesse: https://console.firebase.google.com/project/sitececoni3d/firestore');
+                console.error('🔥 Clique em "Criar banco de dados"');
+            }
+            
+            return false;
+        }
+    }
 }
 
 // Instância global do serviço
 const firebaseService = new FirebaseService();
 window.firebaseService = firebaseService;
+
+// Testar automaticamente após 2 segundos
+setTimeout(() => {
+    console.log('=== INICIANDO TESTE AUTOMÁTICO ===');
+    firebaseService.testFirestoreConnection();
+    
+    // Verificar Authentication
+    console.log('🔐 Testando Authentication...');
+    console.log('Auth disponível?', !!firebaseService.auth);
+    
+    // Verificar Storage
+    console.log('📦 Testando Storage...');
+    console.log('Storage disponível?', !!firebaseService.storage);
+}, 2000);
