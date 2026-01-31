@@ -7,7 +7,7 @@ const CONFIG = {
   whatsapp: {
     phone: '5519999600501',
     messages: {
-      main: 'Olá! Gostaria de solicitar um orçamento para impressão 3D',
+      main: 'Olá! Gostaria de solicitar um orçamento para impressão 3D personalizada.',
       product: (productName) => `Olá! Gostaria de um orçamento para o produto: ${productName}`
     },
     // Gerar link completo do WhatsApp
