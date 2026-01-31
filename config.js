@@ -5,7 +5,7 @@
 const CONFIG = {
   // Configurações do WhatsApp
   whatsapp: {
-    phone: '5519999600501',
+    phone: '5519994083609',
     messages: {
       main: 'Olá! Gostaria de solicitar um orçamento para impressão 3D personalizada.',
       product: (productName) => `Olá! Gostaria de um orçamento para o produto: ${productName}`
