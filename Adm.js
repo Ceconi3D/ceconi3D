@@ -107,6 +107,7 @@ async function initializeAdmin() {
         console.log('Inicializando Firebase...');
         
         // Configurar validações
+        setupPasswordToggle();
         setupPasswordValidation();
         setupRealTimeValidation();
         updateCategoryOptions();
@@ -282,6 +283,29 @@ function updateSelectedColorsPreview() {
 // ========================================================================
 // === SISTEMA DE SEGURANÇA
 // ========================================================================
+
+// Função para inicializar o toggle de visualização de senha
+function setupPasswordToggle() {
+    const toggleBtn = document.getElementById('toggle-password-btn');
+    const passwordInput = document.getElementById('admin-password');
+    
+    if (!toggleBtn || !passwordInput) return;
+    
+    toggleBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Alternar entre password e text
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        
+        // Alternar ícone entre eye e eye-slash
+        const icon = this.querySelector('i');
+        if (icon) {
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
+    });
+}
 
 function setupPasswordValidation() {
     if (!adminPasswordInput) return;
