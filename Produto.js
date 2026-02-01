@@ -161,7 +161,7 @@ function renderProductDetails(product) {
     
     if (product.material) specsContainer.innerHTML += createSpecItem('Material', product.material);
     if (product.dimensions) specsContainer.innerHTML += createSpecItem('Dimensões', product.dimensions);
-    if (product.weight) specsContainer.innerHTML += createSpecItem('Peso', `${product.weight}g`);
+    if (product.weight) specsContainer.innerHTML += createSpecItem('Peso', product.weight);
     if (product.printTime) specsContainer.innerHTML += createSpecItem('Tempo de Impressão', product.printTime);
     if (product.specifications) specsContainer.innerHTML += createSpecItem('Detalhes', product.specifications, true);
 
