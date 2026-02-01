@@ -620,27 +620,33 @@ function setupRealTimeValidation() {
         priceInput.addEventListener('input', function(e) {
             let value = e.target.value;
             
-            // Remove caracteres não numéricos, exceto ponto decimal
-            value = value.replace(/[^\d.]/g, '');
+            // Remove caracteres não numéricos, exceto vírgula e ponto
+            value = value.replace(/[^\d.,]/g, '');
             
-            // Garante que há apenas um ponto decimal
-            const parts = value.split('.');
+            // Converte vírgula para ponto para padronizar internamente
+            // Mas mantém a visualização com vírgula
+            let normalizedValue = value.replace(',', '.');
+            
+            // Garante que há apenas um separador decimal
+            const parts = normalizedValue.split('.');
             if (parts.length > 2) {
-                value = parts[0] + '.' + parts.slice(1).join('');
+                normalizedValue = parts[0] + '.' + parts.slice(1).join('');
             }
             
             // Limita a 2 casas decimais
             if (parts.length === 2 && parts[1].length > 2) {
-                value = parts[0] + '.' + parts[1].substring(0, 2);
+                normalizedValue = parts[0] + '.' + parts[1].substring(0, 2);
             }
             
-            e.target.value = value;
+            // Exibe com vírgula (formato brasileiro)
+            let displayValue = normalizedValue.replace('.', ',');
+            e.target.value = displayValue;
             
             // Validação
-            const numericValue = parseFloat(value);
+            const numericValue = parseFloat(normalizedValue);
             let error = '';
             
-            if (value.length === 0) {
+            if (displayValue.length === 0) {
                 error = 'O preço é obrigatório';
             } else if (isNaN(numericValue)) {
                 error = 'Digite um número válido';
@@ -652,10 +658,10 @@ function setupRealTimeValidation() {
                 error = 'Máximo 2 casas decimais';
             }
             
-            updateFieldValidation('product-price', value, error);
+            updateFieldValidation('product-price', displayValue, error);
             
             // Formatar visualmente
-            if (!isNaN(numericValue) && value.length > 0) {
+            if (!isNaN(numericValue) && displayValue.length > 0) {
                 const formattedValue = numericValue.toLocaleString('pt-BR', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2
@@ -667,9 +673,11 @@ function setupRealTimeValidation() {
         
         // Formatar ao perder o foco
         priceInput.addEventListener('blur', function() {
-            const value = parseFloat(this.value);
-            if (!isNaN(value)) {
-                this.value = value.toFixed(2);
+            let value = this.value.replace(',', '.');
+            const numericValue = parseFloat(value);
+            if (!isNaN(numericValue)) {
+                // Exibe com vírgula (formato brasileiro)
+                this.value = numericValue.toFixed(2).replace('.', ',');
             }
         });
     }
@@ -1384,7 +1392,7 @@ async function handleFormSubmit(e) {
     const productData = {
         name: document.getElementById('product-name').value.trim(),
         description: document.getElementById('product-description').value.trim(),
-        price: parseFloat(document.getElementById('product-price').value),
+        price: parseFloat(document.getElementById('product-price').value.replace(',', '.')),
         category: document.getElementById('product-category').value,
         dimensions: document.getElementById('product-dimensions').value.trim(),
         material: document.getElementById('product-material').value.trim(),
