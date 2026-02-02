@@ -86,7 +86,7 @@ const clearFormBtn = document.getElementById('clear-form-btn');
 const previewContainer = document.getElementById('image-preview');
 
 // Elementos de segurança
-const passwordStrength = document.getElementById('password-strength');
+
 const adminPasswordInput = document.getElementById('admin-password');
 
 // Carregar tudo
@@ -312,77 +312,14 @@ function setupPasswordValidation() {
     
     adminPasswordInput.addEventListener('input', function() {
         const password = this.value;
-        updatePasswordStrength(password);
     });
     
-    adminPasswordInput.addEventListener('focus', function() {
-        showPasswordTips();
-    });
+
 }
 
-function updatePasswordStrength(password) {
-    if (!passwordStrength) return;
-    
-    if (password.length === 0) {
-        passwordStrength.innerHTML = '';
-        passwordStrength.className = 'password-strength';
-        return;
-    }
-    
-    const validation = firebaseService.validatePassword(password);
-    const strengthMessage = firebaseService.getPasswordStrengthMessage(password);
-    
-    let strengthClass = 'weak';
-    let strengthText = 'Senha fraca';
-    
-    if (validation.isStrong) {
-        strengthClass = 'strong';
-        strengthText = 'Senha forte ✓';
-    } else if (password.length >= 6 && (validation.upperCase || validation.lowerCase || validation.numbers)) {
-        strengthClass = 'medium';
-        strengthText = 'Senha média';
-    }
-    
-    passwordStrength.innerHTML = `
-        <div class="strength-bar ${strengthClass}">
-            <div class="strength-fill"></div>
-        </div>
-        <span class="strength-text ${strengthClass}">${strengthText}</span>
-        <div class="strength-details">${strengthMessage}</div>
-    `;
-    passwordStrength.className = `password-strength ${strengthClass}`;
-}
 
-function showPasswordTips() {
-    // Criar tooltip de dicas de senha se não existir
-    if (!document.getElementById('password-tips')) {
-        const tips = document.createElement('div');
-        tips.id = 'password-tips';
-        tips.className = 'password-tips';
-        tips.innerHTML = `
-            <h4>💡 Dicas para senha segura:</h4>
-            <ul>
-                <li>✓ Mínimo 8 caracteres</li>
-                <li>✓ Letras maiúsculas e minúsculas</li>
-                <li>✓ Números (0-9)</li>
-                <li>✓ Símbolos (!@#$% etc.)</li>
-                <li>✓ Não use informações pessoais</li>
-                <li>✓ Evite sequências comuns</li>
-            </ul>
-            <p><strong>Exemplo:</strong> C3c0n1@2025!S3gur0</p>
-        `;
-        
-        const passwordGroup = adminPasswordInput.closest('.form-group');
-        passwordGroup.appendChild(tips);
-        
-        // Remover tooltip após 10 segundos
-        setTimeout(() => {
-            if (tips.parentNode) {
-                tips.remove();
-            }
-        }, 10000);
-    }
-}
+
+
 
 function checkAccountLock() {
     const securityStatus = firebaseService.getSecurityStatus();
